@@ -1,12 +1,11 @@
 import json
 import threading
 import unittest
-from http.server import ThreadingHTTPServer
+from tests.http_server import make_test_server
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 from unittest.mock import patch
 
-from resolveai.__main__ import Handler
 from resolveai.orders import answer_order
 from resolveai.interface import render_page
 from tests.support import IsolatedOrderTestCase
@@ -41,15 +40,15 @@ class OrderTests(IsolatedOrderTestCase):
         self.assertEqual(answer_order(" ")[0], 400)
 
     def test_http_contract(self):
-        customer = patch("resolveai.__main__.customers.identity", return_value="alex")
+        customer = patch("resolveai.web.customers.identity", return_value="alex")
         customer.start()
         self.addCleanup(customer.stop)
-        with ThreadingHTTPServer(("127.0.0.1", 0), Handler) as server:
+        with make_test_server() as server:
             worker = threading.Thread(target=server.serve_forever, daemon=True)
             worker.start()
             base = f"http://127.0.0.1:{server.server_port}"
             try:
-                with patch("resolveai.__main__.answer_question", return_value=(200, {"message": "Your order is shipped.", "mode": "local_ai"})) as agent:
+                with patch("resolveai.web.answer_question", return_value=(200, {"message": "Your order is shipped.", "mode": "local_ai"})) as agent:
                     request = Request(base + "/ask", data=b"question=Track+DEMO-1001", headers={"Content-Type": "application/x-www-form-urlencoded"})
                     with urlopen(request, timeout=2) as response:
                         self.assertIn("Your order is shipped.", response.read().decode())

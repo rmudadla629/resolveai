@@ -4,7 +4,7 @@ A local, single-process support prototype using fictional records. The model rou
 
 ```mermaid
 flowchart TD
-    Browser --> HTTP[Python localhost server]
+    Browser --> HTTP[Flask and Waitress localhost server]
     HTTP --> Ask[Question workflow]
     Ask --> Router[Ollama Qwen3: intent and ID]
     Router --> Validation[Validate decision and original ID]
@@ -24,7 +24,7 @@ flowchart TD
 
 The HTTP form handler validates request size. The model returns schema-constrained intent and order ID. Python validates the decision; lookup IDs must occur in the original question. Order responses use record-based templates. Policy retrieval uses keyword overlap first, then cosine ranking when no keyword matches. Score and margin thresholds control semantic abstention. Policy excerpts are copied verbatim, not synthesized.
 
-Question requests receive trace IDs and record status, outcome, tool, retrieval method, and duration. Prompts and answers are excluded from the trace database. HTML output is escaped. Unexpected question-processing exceptions produce a generic response; review-route failure handling remains incomplete.
+Question requests receive trace IDs and record status, outcome, tool, retrieval method, and duration. Prompts and answers are excluded from the trace database. HTML output is escaped. Unexpected question-processing exceptions produce a generic response; unexpected route exceptions return generic HTTP 500 responses.
 
 ## Manual review
 
@@ -44,7 +44,7 @@ CI uses temporary databases and mocked model calls. Separate live evaluations us
 - Exact excerpts provide citations but not personalized eligibility decisions.
 - Keyword-first search is not weighted hybrid ranking; keyword collisions and semantic false negatives remain possible.
 - Three policy sections do not require a vector database. Larger corpora need ingestion, chunking, indexing, and access-aware retrieval.
-- Development HTTP server with local reviewer sign-in, but without rate limiting, deployment configuration, or load validation.
+- Waitress-served Flask application with local reviewer sign-in, but without rate limiting, deployment configuration, or load validation.
 - Request-level metrics, without model spans, token counts, or accuracy measurement.
 
 ## Delivery gates

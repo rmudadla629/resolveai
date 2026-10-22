@@ -2,14 +2,13 @@ import re
 import threading
 from pathlib import Path
 from http.cookiejar import CookieJar
-from http.server import ThreadingHTTPServer
+from tests.http_server import make_test_server
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import build_opener, HTTPCookieProcessor, Request
 from unittest.mock import patch
 
 from resolveai import customers, reviews
-from resolveai.__main__ import Handler
 from resolveai.agent import answer_question
 from tests.support import IsolatedOrderTestCase
 
@@ -42,7 +41,7 @@ class CustomerTests(IsolatedOrderTestCase):
     def test_http_customer_isolation_and_review_permissions(self):
         customers.configure("alex", "test-customer-password")
         customers.configure("sam", "test-second-password")
-        with ThreadingHTTPServer(("127.0.0.1", 0), Handler) as server:
+        with make_test_server() as server:
             worker = threading.Thread(target=server.serve_forever, daemon=True)
             worker.start()
             base = f"http://127.0.0.1:{server.server_port}"

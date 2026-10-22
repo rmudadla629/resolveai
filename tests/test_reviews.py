@@ -2,7 +2,7 @@ import tempfile
 import unittest
 import threading
 import re
-from http.server import ThreadingHTTPServer
+from tests.http_server import make_test_server
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
 from urllib.parse import urlencode
@@ -11,7 +11,6 @@ from unittest.mock import patch
 
 from resolveai import reviews
 from resolveai.orders import lookup_order
-from resolveai.__main__ import Handler
 
 
 class ReviewTests(unittest.TestCase):
@@ -53,10 +52,10 @@ class ReviewTests(unittest.TestCase):
         self.assertEqual(lookup_order("DEMO-1002")["status"], "shipped")
 
     def test_review_http_token_and_submission(self):
-        patcher = patch("resolveai.__main__.auth.authorized", return_value=True)
+        patcher = patch("resolveai.web.auth.authorized", return_value=True)
         patcher.start()
         self.addCleanup(patcher.stop)
-        with ThreadingHTTPServer(("127.0.0.1", 0), Handler) as server:
+        with make_test_server() as server:
             worker = threading.Thread(target=server.serve_forever, daemon=True)
             worker.start()
             base = f"http://127.0.0.1:{server.server_port}"

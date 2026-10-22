@@ -2,7 +2,7 @@ import tempfile
 import unittest
 import threading
 import re
-from http.server import ThreadingHTTPServer
+from tests.http_server import make_test_server
 from http.cookiejar import CookieJar
 from urllib.request import build_opener, HTTPCookieProcessor, Request
 from urllib.error import HTTPError
@@ -11,7 +11,6 @@ from pathlib import Path
 from unittest.mock import patch
 
 from resolveai import auth
-from resolveai.__main__ import Handler
 
 
 class AuthTests(unittest.TestCase):
@@ -48,7 +47,7 @@ class AuthTests(unittest.TestCase):
 
     def test_http_login_logout_and_blocked_review(self):
         auth.configure("test-only-password-123")
-        with ThreadingHTTPServer(("127.0.0.1", 0), Handler) as server:
+        with make_test_server() as server:
             worker = threading.Thread(target=server.serve_forever, daemon=True)
             worker.start()
             base = f"http://127.0.0.1:{server.server_port}"
@@ -63,7 +62,7 @@ class AuthTests(unittest.TestCase):
                 with self.assertRaises(HTTPError) as error:
                     post("/reviews/decide", {"token": token, "request_id": 1, "action": "approve"})
                 self.assertEqual(error.exception.code, 401)
-                with patch("resolveai.__main__.render_reviews", return_value=b"Authenticated review controls"):
+                with patch("resolveai.web.render_reviews", return_value=b"Authenticated review controls"):
                     with post("/login", {"token": token, "password": "test-only-password-123"}) as response:
                         self.assertIn("Authenticated review controls", response.read().decode())
                 with post("/logout", {"token": token}) as response:
