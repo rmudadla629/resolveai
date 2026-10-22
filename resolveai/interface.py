@@ -24,6 +24,8 @@ def render_page(order_id: str | None = None, question: str = "", ai_body: dict |
         source = f'<p class="source">Source: {escape(ai_body["source"])}</p>' if "source" in ai_body else ""
         for citation in ai_body.get("citations", []):
             source += f'<blockquote><p>{escape(citation["excerpt"])}</p><a href="/policies#{escape(citation["id"], quote=True)}">Source: {escape(citation["title"])}</a></blockquote>'
+        if "retrieval_method" in ai_body:
+            source += f'<p class="source">Search method: {escape(ai_body["retrieval_method"])}</p>'
         ai_result = f'<section class="result" role="status"><h2>Support response</h2><p>{escape(ai_body["message"])}</p>{source}</section>'
     return f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8">

@@ -65,7 +65,7 @@ Question form → local model intent/ID extraction → application validation �
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-Twenty-four tests cover order statuses, input normalization, missing and unknown IDs, HTML escaping, HTTP form/API responses, invented model IDs, unsupported requests, input limits, model failures, and evaluation scoring. Automated model tests use mocks; these verify application behavior rather than model accuracy.
+Twenty-eight tests cover order statuses, input normalization, missing and unknown IDs, HTML escaping, HTTP form/API responses, invented model IDs, unsupported requests, input limits, model failures, and evaluation scoring. Automated model tests use mocks; these verify application behavior rather than model accuracy.
 
 ## Live model evaluation
 
@@ -91,9 +91,23 @@ Keep passwords, tokens, and API keys outside version control.
 
 ## Policy retrieval
 
-General policy questions are routed by the local model to a keyword retriever over three fictional policy sections in `data/policies.json`. Relevant passages are shown verbatim with links to `/policies` and stable section anchors. Questions with no matching keywords receive a missing-policy response. Policy excerpts describe general rules and do not establish eligibility for a specific order.
+General policy questions are routed by the local model to keyword-first retrieval over three fictional policy sections in `data/policies.json`. If no keywords match, `all-minilm:22m` embeddings rank sections by cosine similarity. The top section must score at least 0.35 and exceed the second by 0.06; otherwise retrieval abstains. These are development thresholds, not calibrated confidence probabilities. Keyword matches take priority and can still select irrelevant passages. If embeddings fail, the response explicitly identifies `keyword_fallback`.
 
-This is extractive policy retrieval, not embedding-based semantic search or generated RAG answers. Paraphrases without matching keywords may fail. Citation checks verify exact source text and document links. The live dataset includes six policy scenarios alongside the original twelve scenarios.
+Install the additional local embedding model:
+
+```sh
+ollama pull all-minilm:22m
+```
+
+Exact passages are shown with links to `/policies` and stable section anchors. The page displays the search method. Document embeddings are cached in memory by document content; edited policies get new vectors. No vector database is needed for three sections. This remains extractive retrieval, not generated answer synthesis. Policy excerpts describe general rules and do not establish eligibility for an individual order.
+
+Compare retrieval independently of chat routing:
+
+```sh
+.venv/bin/python -m resolveai.compare_retrieval
+```
+
+The first local run scored keyword retrieval 5/10 and keyword-first semantic fallback 9/10 on `data/retrieval_questions.json`. Both methods missed “The product is faulty. What should I do?” The small set informed implementation and is not held out. Reports under `reports/retrieval-*.json` include each result, timings, model name, and dataset hash. This comparison does not measure end-to-end AI intent routing. Embedding failures cause the comparison to exit rather than misreport fallback as semantic performance.
 
 ## Cancellation review sandbox
 

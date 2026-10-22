@@ -1,0 +1,12 @@
+[
+ {"question":"What is the return policy?","expected":"returns"},
+ {"question":"How long does shipping take?","expected":"shipping"},
+ {"question":"What is the cancellation policy?","expected":"cancellations"},
+ {"question":"How soon will my parcel reach me?","expected":"shipping"},
+ {"question":"Can I stop a purchase before it leaves the warehouse?","expected":"cancellations"},
+ {"question":"Can I send an unopened item back?","expected":"returns"},
+ {"question":"When will the money go back to my card?","expected":"returns"},
+ {"question":"The product is faulty. What should I do?","expected":"returns"},
+ {"question":"What is your warranty policy?","expected":null},
+ {"question":"Do you offer gift wrapping?","expected":null}
+]
