@@ -6,9 +6,28 @@ from urllib.parse import parse_qs, urlsplit
 
 from .orders import answer_order
 from .interface import render_page
+from .agent import answer_question
 
 
 class Handler(BaseHTTPRequestHandler):
+    def do_POST(self):
+        if self.path != "/ask":
+            self.respond(404, b'Endpoint not found.', "text/plain; charset=utf-8")
+            return
+        try:
+            size = int(self.headers.get("Content-Length", "0"))
+            if not 0 < size <= 8192:
+                raise ValueError("Invalid body length")
+            if self.headers.get("Content-Type", "").split(";")[0] != "application/x-www-form-urlencoded":
+                raise ValueError("Unsupported form")
+            form = parse_qs(self.rfile.read(size).decode("utf-8"))
+        except (ValueError, UnicodeError):
+            self.respond(400, b'Invalid form submission.', "text/plain; charset=utf-8")
+            return
+        question = form.get("question", [""])[0]
+        status, body = answer_question(question)
+        self.respond(status, render_page(question=question, ai_body=body), "text/html; charset=utf-8")
+
     def do_GET(self):
         url = urlsplit(self.path)
         if url.path == "/":

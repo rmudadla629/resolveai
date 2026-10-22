@@ -3,7 +3,8 @@ import threading
 import unittest
 from http.server import ThreadingHTTPServer
 from urllib.error import HTTPError
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
+from unittest.mock import patch
 
 from resolveai.__main__ import Handler
 from resolveai.orders import answer_order
@@ -44,6 +45,11 @@ class OrderTests(unittest.TestCase):
             worker.start()
             base = f"http://127.0.0.1:{server.server_port}"
             try:
+                with patch("resolveai.__main__.answer_question", return_value=(200, {"message": "Your order is shipped.", "mode": "local_ai"})) as agent:
+                    request = Request(base + "/ask", data=b"question=Track+DEMO-1001", headers={"Content-Type": "application/x-www-form-urlencoded"})
+                    with urlopen(request, timeout=2) as response:
+                        self.assertIn("Your order is shipped.", response.read().decode())
+                    agent.assert_called_once_with("Track DEMO-1001")
                 with urlopen(base + "/?order_id=DEMO-1002", timeout=2) as response:
                     self.assertIn("text/html", response.headers["Content-Type"])
                     self.assertIn("is processing", response.read().decode())

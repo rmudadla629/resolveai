@@ -5,7 +5,7 @@ from html import escape
 from .orders import answer_order
 
 
-def render_page(order_id: str | None = None) -> bytes:
+def render_page(order_id: str | None = None, question: str = "", ai_body: dict | None = None) -> bytes:
     result = ""
     if order_id is not None:
         status, body = answer_order(order_id)
@@ -13,6 +13,10 @@ def render_page(order_id: str | None = None) -> bytes:
         source = f'<p class="source">Source: {escape(body["source"])}</p>' if "source" in body else ""
         result = f'<section class="result" role="status"><h2>{heading}</h2><p>{escape(body["message"])}</p>{source}</section>'
     value = escape(order_id or "", quote=True)
+    ai_result = ""
+    if ai_body is not None:
+        source = f'<p class="source">Source: {escape(ai_body["source"])}</p>' if "source" in ai_body else ""
+        ai_result = f'<section class="result" role="status"><h2>Support response</h2><p>{escape(ai_body["message"])}</p>{source}</section>'
     return f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -35,8 +39,11 @@ h2 {{font-size:21px;margin:0 0 10px}} footer {{margin-top:24px}} @media(max-widt
 <header><strong>ResolveAI<span style="color:#2255c9">.</span></strong></header>
 <main><div class="tag">Order support · Demo</div><h1>Where is my order?</h1>
 <p class="intro">Check the latest status of a sample order. Each answer comes directly from the demo store’s records.</p>
+<div class="card"><form action="/ask" method="post"><label for="question">Ask about an order</label>
+<div class="row"><input id="question" name="question" value="{escape(question, quote=True)}" placeholder="Where is my order DEMO-1001?" required maxlength="1000"><button type="submit">Ask ResolveAI</button></div>
+<p class="help">Local AI · Qwen3 4B through Ollama. The first response may take a little longer while the model loads.</p></form>{ai_result}</div>
 <div class="card"><form action="/" method="get"><label for="order-id">Order ID</label>
 <div class="row"><input id="order-id" name="order_id" value="{value}" placeholder="e.g. DEMO-1001" aria-describedby="examples" required maxlength="100"><button type="submit">Check order</button></div>
 <p id="examples" class="help">Try <a href="/?order_id=DEMO-1001">DEMO-1001</a> (shipped), <a href="/?order_id=DEMO-1002">DEMO-1002</a> (processing), or <a href="/?order_id=DEMO-1003">DEMO-1003</a> (delivered).</p></form>{result}</div>
-<footer>Fictional orders only. This version uses fixed lookup logic; AI is not connected yet.</footer>
+<footer>Fictional orders only. AI interprets questions; order facts come from records. The order ID form uses direct lookup without AI. No refunds or order changes are performed.</footer>
 </main></body></html>'''.encode("utf-8")
