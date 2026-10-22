@@ -30,3 +30,7 @@ These small development datasets informed implementation and are not held out. R
 ## Scope
 
 No real store integration, actual refunds, production users, multi-agent coordination, generated policy synthesis, or custom model training is implemented. Cancellation changes affect fictional local state only.
+
+## Later challenge reassessment
+
+See [Challenge results](CHALLENGE_RESULTS.md). The previously missed faulty-product retrieval is corrected on the development example. Broader routing still has two documented failures. Customer/reviewer access checks, login limits, and Flask/Waitress serving have since been added; the gaps above describe the earlier review snapshot. Public readiness remains unverified.

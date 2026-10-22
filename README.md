@@ -73,7 +73,7 @@ Question form → local model intent/ID extraction → application validation �
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-Fifty-four tests cover order statuses, input normalization, missing and unknown IDs, HTML escaping, HTTP form/API responses, invented model IDs, unsupported requests, input limits, model failures, and evaluation scoring. Automated model tests use mocks; these verify application behavior rather than model accuracy.
+Fifty-seven tests cover order statuses, input normalization, missing and unknown IDs, HTML escaping, HTTP form/API responses, invented model IDs, unsupported requests, input limits, model failures, and evaluation scoring. Automated model tests use mocks; these verify application behavior rather than model accuracy.
 
 ## Live model evaluation
 
@@ -192,3 +192,17 @@ Counters are in memory, clear on server restart, and apply only to one process. 
 `Dockerfile` packages Flask/Waitress as a non-root application. `compose.yaml` publishes the app on localhost port 8001, uses private service networking for Ollama, and persists runtime state, reports, and model files in named volumes. The build context excludes local credentials and databases. `RESOLVEAI_OLLAMA_URL` supports the internal model service without changing the native localhost default.
 
 The CI container job validates Compose, builds the image, runs regression tests inside it, and checks server health without downloading models. Full Compose inference and native ARM container execution require separate verification. Docker was not installed locally when this packaging was prepared. See [Container guide](CONTAINERS.md) for setup and verification limits.
+
+## Challenge evaluation and failure analysis
+
+Run the broader authored development set with repeated attempts:
+
+```sh
+.venv/bin/python -m resolveai.evaluate --dataset data/challenge_questions.json --repeat 2
+```
+
+The 22-case set covers paraphrases, unknown policies, action requests, multiple orders, mixed informational requests, an instruction override, and invalid input. It includes new questions plus previously known hard examples. It is not an independently sourced held-out test. After results informed routing changes it is explicitly development/regression data. Repeated cases are not independent samples.
+
+Reports include category counts, dataset hash, workflow/policy source hash, repetitions, responses, and latency. The baseline passed 15/22; after clearer routing priorities and damaged-product vocabulary, two runs passed 20/22 each (40/44 attempts). Two failures remain: a general pre-dispatch cancellation question is declined, and a tracking-plus-policy request receives only the policy response. No cancellation action is performed by chat.
+
+Retrieval-only comparison now scores keyword 6/10 and semantic fallback 10/10 on the existing tuned set. The faulty-product question now retrieves correctly when routed to policies. These are development improvements, not production accuracy guarantees. See [Challenge results](CHALLENGE_RESULTS.md) for preserved evidence.

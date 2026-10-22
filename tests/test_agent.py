@@ -8,6 +8,22 @@ from tests.support import IsolatedOrderTestCase
 
 class AgentTests(IsolatedOrderTestCase):
     @patch("resolveai.agent.classify")
+    def test_mixed_request_clarifies_without_lookup(self, model):
+        model.return_value = {"intent": "clarification", "order_id": "DEMO-1001"}
+        with patch("resolveai.agent.answer_order") as lookup:
+            status, body = answer_question("Track DEMO-1001 and explain returns")
+        self.assertEqual((status, body["outcome"]), (200, "clarification"))
+        lookup.assert_not_called()
+
+    @patch("resolveai.agent.classify")
+    def test_unknown_policy_has_no_fabricated_citation(self, model):
+        model.return_value = {"intent": "policy_missing", "order_id": ""}
+        with patch("resolveai.agent.answer_policy") as retrieval:
+            status, body = answer_question("Which countries do you ship to?")
+        self.assertEqual(body["outcome"], "policy_not_found")
+        self.assertNotIn("citations", body)
+        retrieval.assert_not_called()
+    @patch("resolveai.agent.classify")
     def test_order_lookup_and_missing_record(self, model):
         for order_id, status in [("DEMO-1001", 200), ("DEMO-9999", 404)]:
             model.return_value = {"intent": "order_status", "order_id": order_id}

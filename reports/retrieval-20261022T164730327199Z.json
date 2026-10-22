@@ -1,0 +1,197 @@
+{
+  "model": "all-minilm:22m",
+  "dataset_sha256": "b8522958c30f16351ecce6f5c2fd5857795f49d1719903b7727be4f10be8595b",
+  "limitations": "Small development set used while implementing thresholds, not held-out evaluation. Keyword-first routing; exact excerpts, no generated synthesis.",
+  "summary": {
+    "keyword": {
+      "passed": 6,
+      "total": 10
+    },
+    "hybrid": {
+      "passed": 10,
+      "total": 10
+    }
+  },
+  "results": [
+    {
+      "question": "What is the return policy?",
+      "expected": "returns",
+      "method": "keyword",
+      "actual_method": "keyword",
+      "predicted": "returns",
+      "passed": true,
+      "latency_seconds": 0.0004
+    },
+    {
+      "question": "What is the return policy?",
+      "expected": "returns",
+      "method": "hybrid",
+      "actual_method": "keyword",
+      "predicted": "returns",
+      "passed": true,
+      "latency_seconds": 0.0001
+    },
+    {
+      "question": "How long does shipping take?",
+      "expected": "shipping",
+      "method": "keyword",
+      "actual_method": "keyword",
+      "predicted": "shipping",
+      "passed": true,
+      "latency_seconds": 0.0
+    },
+    {
+      "question": "How long does shipping take?",
+      "expected": "shipping",
+      "method": "hybrid",
+      "actual_method": "keyword",
+      "predicted": "shipping",
+      "passed": true,
+      "latency_seconds": 0.0
+    },
+    {
+      "question": "What is the cancellation policy?",
+      "expected": "cancellations",
+      "method": "keyword",
+      "actual_method": "keyword",
+      "predicted": "cancellations",
+      "passed": true,
+      "latency_seconds": 0.0
+    },
+    {
+      "question": "What is the cancellation policy?",
+      "expected": "cancellations",
+      "method": "hybrid",
+      "actual_method": "keyword",
+      "predicted": "cancellations",
+      "passed": true,
+      "latency_seconds": 0.0
+    },
+    {
+      "question": "How soon will my parcel reach me?",
+      "expected": "shipping",
+      "method": "keyword",
+      "actual_method": "keyword",
+      "predicted": null,
+      "passed": false,
+      "latency_seconds": 0.0
+    },
+    {
+      "question": "How soon will my parcel reach me?",
+      "expected": "shipping",
+      "method": "hybrid",
+      "actual_method": "semantic",
+      "predicted": "shipping",
+      "passed": true,
+      "latency_seconds": 0.0356
+    },
+    {
+      "question": "Can I stop a purchase before it leaves the warehouse?",
+      "expected": "cancellations",
+      "method": "keyword",
+      "actual_method": "keyword",
+      "predicted": null,
+      "passed": false,
+      "latency_seconds": 0.0001
+    },
+    {
+      "question": "Can I stop a purchase before it leaves the warehouse?",
+      "expected": "cancellations",
+      "method": "hybrid",
+      "actual_method": "semantic",
+      "predicted": "cancellations",
+      "passed": true,
+      "latency_seconds": 0.0059
+    },
+    {
+      "question": "Can I send an unopened item back?",
+      "expected": "returns",
+      "method": "keyword",
+      "actual_method": "keyword",
+      "predicted": null,
+      "passed": false,
+      "latency_seconds": 0.0001
+    },
+    {
+      "question": "Can I send an unopened item back?",
+      "expected": "returns",
+      "method": "hybrid",
+      "actual_method": "semantic",
+      "predicted": "returns",
+      "passed": true,
+      "latency_seconds": 0.0054
+    },
+    {
+      "question": "When will the money go back to my card?",
+      "expected": "returns",
+      "method": "keyword",
+      "actual_method": "keyword",
+      "predicted": null,
+      "passed": false,
+      "latency_seconds": 0.0001
+    },
+    {
+      "question": "When will the money go back to my card?",
+      "expected": "returns",
+      "method": "hybrid",
+      "actual_method": "semantic",
+      "predicted": "returns",
+      "passed": true,
+      "latency_seconds": 0.0066
+    },
+    {
+      "question": "The product is faulty. What should I do?",
+      "expected": "returns",
+      "method": "keyword",
+      "actual_method": "keyword",
+      "predicted": "returns",
+      "passed": true,
+      "latency_seconds": 0.0002
+    },
+    {
+      "question": "The product is faulty. What should I do?",
+      "expected": "returns",
+      "method": "hybrid",
+      "actual_method": "keyword",
+      "predicted": "returns",
+      "passed": true,
+      "latency_seconds": 0.0
+    },
+    {
+      "question": "What is your warranty policy?",
+      "expected": null,
+      "method": "keyword",
+      "actual_method": "keyword",
+      "predicted": null,
+      "passed": true,
+      "latency_seconds": 0.0
+    },
+    {
+      "question": "What is your warranty policy?",
+      "expected": null,
+      "method": "hybrid",
+      "actual_method": "semantic",
+      "predicted": null,
+      "passed": true,
+      "latency_seconds": 0.0059
+    },
+    {
+      "question": "Do you offer gift wrapping?",
+      "expected": null,
+      "method": "keyword",
+      "actual_method": "keyword",
+      "predicted": null,
+      "passed": true,
+      "latency_seconds": 0.0001
+    },
+    {
+      "question": "Do you offer gift wrapping?",
+      "expected": null,
+      "method": "hybrid",
+      "actual_method": "semantic",
+      "predicted": null,
+      "passed": true,
+      "latency_seconds": 0.0063
+    }
+  ]
+}
