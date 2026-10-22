@@ -26,6 +26,8 @@ The question router calls `http://127.0.0.1:11434/api/chat`, with thinking disab
 
 ## Quick start
 
+See [Demo guide](DEMO.md) for first-time setup, a five-minute walkthrough, troubleshooting, and a confirmed reset that preserves account credentials.
+
 Requires Python 3.12. Install the pinned application dependencies; no API keys are needed.
 
 ```sh
@@ -69,7 +71,7 @@ Question form → local model intent/ID extraction → application validation �
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-Forty-three tests cover order statuses, input normalization, missing and unknown IDs, HTML escaping, HTTP form/API responses, invented model IDs, unsupported requests, input limits, model failures, and evaluation scoring. Automated model tests use mocks; these verify application behavior rather than model accuracy.
+Forty-seven tests cover order statuses, input normalization, missing and unknown IDs, HTML escaping, HTTP form/API responses, invented model IDs, unsupported requests, input limits, model failures, and evaluation scoring. Automated model tests use mocks; these verify application behavior rather than model accuracy.
 
 ## Live model evaluation
 
@@ -168,3 +170,9 @@ Already-cancelled DEMO-1002 remains cancelled; setup does not reset sandbox stat
 The app and server limit request bodies to 8 KiB. Responses prevent browser caching and include frame denial and MIME-sniffing protections. Unexpected route errors return a generic 500 without exposing exception details. `/health` checks the HTTP application only, not Ollama or database readiness. CI installs `requirements.txt` before testing. Tests include a real Waitress HTTP smoke check.
 
 Keep the localhost default. A deployment-ready server alone does not establish public readiness: HTTPS/Secure cookies, login throttling, deployment secrets/configuration, durable session storage, and operational validation remain unfinished. Sessions and the form token are process-local; use one process and expect sign-in again after restarting. Models still run through local Ollama. No hosting was created or purchased.
+
+## Demo utilities
+
+Run `.venv/bin/python -m resolveai.doctor` for read-only checks of Python, installed server dependencies, account configuration presence, and local Ollama models. It does not reveal passwords or validate model accuracy.
+
+Run `.venv/bin/python -m resolveai.demo` for a no-change reset preview. Only after stopping the server, use `--server-stopped --confirm RESET-DEMO` to back up review/trace databases and clear fictional activity. Credentials and JSON fixtures are preserved. The command relies on the operator to stop the server. See [Demo guide](DEMO.md) before resetting. Runtime databases and backups stay excluded from Git.
