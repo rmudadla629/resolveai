@@ -34,3 +34,7 @@ No real store integration, actual refunds, production users, multi-agent coordin
 ## Later challenge reassessment
 
 See [Challenge results](CHALLENGE_RESULTS.md). The previously missed faulty-product retrieval is corrected on the development example. Broader routing still has two documented failures. Customer/reviewer access checks, login limits, and Flask/Waitress serving have since been added; the gaps above describe the earlier review snapshot. Public readiness remains unverified.
+
+## Routing fix follow-up
+
+The two challenge routing failures were corrected on the authored development set: 22/22 in each of two runs, original scenarios 18/18, and 57 automated regressions passed. See CHALLENGE_RESULTS.md for the reports and the distinction between tuned examples and independent evaluation.

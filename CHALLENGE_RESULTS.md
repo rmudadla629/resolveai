@@ -28,3 +28,15 @@ The baseline also returned a general shipping document for a question about dest
 ## Interpretation
 
 The results demonstrate measured development progress and visible failure analysis. They do not establish production reliability or prove safety against arbitrary prompts. The 18-case original suite and automated tests remain separate regression checks. Next evaluation work should reserve independent examples, test additional model versions and paraphrases, and include grounded-answer completeness rather than only outcomes and source integrity.
+
+## Routing fix verification
+
+A later prompt revision added contrasting examples of general cancellation eligibility, explicit cancellation execution, combined tracking-and-policy requests, and ordinary cancellation rules. The examples use different phrasings and IDs from the challenge questions. These are prompt examples, not model training or fine-tuning.
+
+- Challenge: **44/44 attempts passed**, 22/22 in each of two runs. [Report](reports/evaluation-20261022T165327234840Z.json).
+- Original scenarios: **18/18 passed**. [Report](reports/evaluation-20261022T165323295585Z.json).
+- Automated regressions: **57 passed** locally.
+
+Both previously documented failures now produce the expected outcomes on these examples: the general eligibility question retrieves the cancellations passage, and the combined request asks the user to split the question. The execution counterexample remains unsupported; chat still cannot cancel orders.
+
+The challenge and original evaluation overlapped in time on one Ollama instance, so these reports' timings can include queueing. Do not use their latency values as a controlled before/after speed comparison. Scores remain development/regression measurements on a tuned set; fresh independent evaluation is still required for broader claims. No public deployment or container-model inference validation was performed during this fix.
