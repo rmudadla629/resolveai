@@ -22,7 +22,7 @@ Install [Ollama](https://ollama.com/download/mac), keep it running, and download
 ollama pull qwen3:4b
 ```
 
-The application calls only `http://127.0.0.1:11434/api/chat`, with thinking disabled, a 90-second timeout, and a bounded context. No API key is needed. Ask “Where is my order DEMO-1001?” in the question form. Each request is independent; conversation memory is not implemented. The model classifies intent and extracts an ID; Python controls the lookup and response. This is a constrained workflow, not an autonomous multi-agent system.
+The question router calls `http://127.0.0.1:11434/api/chat`, with thinking disabled, a 90-second timeout, and a bounded context. No API key is needed. Ask “Where is my order DEMO-1001?” in the question form. Each request is independent; conversation memory is not implemented. The model classifies intent and extracts an ID; Python controls the lookup and response. This is a constrained workflow, not an autonomous multi-agent system.
 
 ## Quick start
 
@@ -47,6 +47,8 @@ Open http://127.0.0.1:8000/ and enter `DEMO-1001`, `DEMO-1002`, or `DEMO-1003`. 
 The order API returns HTTP 200 for a match, 400 for a missing ID, and 404 for an unknown order. The browser form returns a page explaining the result.
 
 ## Architecture
+
+See [Architecture](ARCHITECTURE.md) for the system diagram and design choices, and [Project review](PROJECT_REVIEW.md) for measured results, known failures, and delivery gates.
 
 Browser form → HTTP handler → order lookup tool → fictional JSON records.
 
