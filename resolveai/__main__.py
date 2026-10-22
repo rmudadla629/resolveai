@@ -5,7 +5,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlsplit
 
 from .orders import answer_order
-from .interface import render_page
+from .interface import render_page, render_policies
 from .agent import answer_question
 
 
@@ -30,6 +30,9 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         url = urlsplit(self.path)
+        if url.path == "/policies":
+            self.respond(200, render_policies(), "text/html; charset=utf-8")
+            return
         if url.path == "/":
             params = parse_qs(url.query, keep_blank_values=True)
             order_id = params.get("order_id", [None])[0]

@@ -1,0 +1,5 @@
+[
+  {"id":"returns","title":"Returns and refunds","keywords":["return","returns","refund","refunds","damaged","broken"],"text":"Unopened items may be returned within 30 days of delivery. Report damaged items within 7 days of delivery. Approved refunds are issued to the original payment method within 5–10 business days after inspection. This demo cannot approve or issue refunds."},
+  {"id":"shipping","title":"Shipping and delivery","keywords":["shipping","delivery","deliver","ship","arrive","arrival"],"text":"Standard shipping takes 3–5 business days after dispatch. Processing may take up to 2 business days before dispatch. These are general estimates, not a guaranteed arrival date for an individual order."},
+  {"id":"cancellations","title":"Cancellations and address changes","keywords":["cancel","cancellation","cancellations","address","change"],"text":"Cancellation or shipping address change requests can be reviewed only before dispatch. Shipped orders cannot be cancelled or rerouted through this store. Contact a support representative to request review. This demo cannot change or cancel orders."}
+]

@@ -8,6 +8,7 @@ from pathlib import Path
 from time import perf_counter
 
 from .agent import answer_question
+from .policies import load_policies
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -17,12 +18,19 @@ def passes(case, status, body):
     expected_http = 404 if expected == "not_found" else 200
     if body.get("outcome") != expected or status != expected_http:
         return False
+    if expected == "policy":
+        citations = body.get("citations", [])
+        policies = {p["id"]: p for p in load_policies()}
+        return (case["policy_id"] in [c.get("id") for c in citations]
+                and all(c.get("id") in policies and c.get("excerpt") == policies[c["id"]]["text"]
+                        and c.get("url") == "/policies#" + c["id"] for c in citations)
+                and "order" not in body)
     if expected == "found":
         order = body.get("order", {})
         return (order.get("order_id") == case["order_id"]
                 and order.get("status") == case["order_status"]
                 and body.get("source") == f'demo-orders:{case["order_id"]}')
-    return "order" not in body and "source" not in body
+    return "order" not in body and "source" not in body and "citations" not in body
 
 
 def main():
