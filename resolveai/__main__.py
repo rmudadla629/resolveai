@@ -1,17 +1,22 @@
 """Local demo API. Run: python -m resolveai."""
 
 import json
+import secrets
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlsplit
 
 from .orders import answer_order
 from .interface import render_page, render_policies
 from .agent import answer_question
+from .review_interface import render_reviews
+from .reviews import submit, decide
+
+REVIEW_TOKEN = secrets.token_urlsafe(32)
 
 
 class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
-        if self.path != "/ask":
+        if self.path not in ("/ask", "/reviews/submit", "/reviews/decide"):
             self.respond(404, b'Endpoint not found.', "text/plain; charset=utf-8")
             return
         try:
@@ -24,12 +29,30 @@ class Handler(BaseHTTPRequestHandler):
         except (ValueError, UnicodeError):
             self.respond(400, b'Invalid form submission.', "text/plain; charset=utf-8")
             return
+        if self.path.startswith("/reviews/"):
+            if not secrets.compare_digest(form.get("token", [""])[0], REVIEW_TOKEN):
+                self.respond(403, b'Invalid form token. Reload the reviews page.', "text/plain")
+                return
+            if self.path == "/reviews/submit":
+                message = submit(form.get("order_id", [""])[0])
+            else:
+                try:
+                    request_id = int(form.get("request_id", [""])[0])
+                except ValueError:
+                    self.respond(400, b'Invalid request ID.', "text/plain")
+                    return
+                message = decide(request_id, form.get("action", [""])[0])
+            self.respond(200, render_reviews(REVIEW_TOKEN, message), "text/html; charset=utf-8")
+            return
         question = form.get("question", [""])[0]
         status, body = answer_question(question)
         self.respond(status, render_page(question=question, ai_body=body), "text/html; charset=utf-8")
 
     def do_GET(self):
         url = urlsplit(self.path)
+        if url.path == "/reviews":
+            self.respond(200, render_reviews(REVIEW_TOKEN), "text/html; charset=utf-8")
+            return
         if url.path == "/policies":
             self.respond(200, render_policies(), "text/html; charset=utf-8")
             return

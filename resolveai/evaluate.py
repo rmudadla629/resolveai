@@ -3,6 +3,8 @@
 import hashlib
 import json
 import math
+import tempfile
+from unittest.mock import patch
 from datetime import datetime, timezone
 from pathlib import Path
 from time import perf_counter
@@ -33,7 +35,7 @@ def passes(case, status, body):
     return "order" not in body and "source" not in body and "citations" not in body
 
 
-def main():
+def run_evaluation():
     dataset = (ROOT / "data/eval_questions.json").read_bytes()
     cases = json.loads(dataset)
     results = []
@@ -59,6 +61,13 @@ def main():
     path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(f'{passed}/{len(results)} passed. Report: {path}', flush=True)
     return 0 if passed == len(results) else 1
+
+
+def main():
+    # Evaluate the fixed order fixtures, independent of manual review activity.
+    with tempfile.TemporaryDirectory() as directory:
+        with patch("resolveai.reviews.DB_PATH", Path(directory) / "reviews.sqlite3"):
+            return run_evaluation()
 
 
 if __name__ == "__main__":

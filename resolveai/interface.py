@@ -53,5 +53,5 @@ h2 {{font-size:21px;margin:0 0 10px}} footer {{margin-top:24px}} @media(max-widt
 <div class="card"><form action="/" method="get"><label for="order-id">Order ID</label>
 <div class="row"><input id="order-id" name="order_id" value="{value}" placeholder="e.g. DEMO-1001" aria-describedby="examples" required maxlength="100"><button type="submit">Check order</button></div>
 <p id="examples" class="help">Try <a href="/?order_id=DEMO-1001">DEMO-1001</a> (shipped), <a href="/?order_id=DEMO-1002">DEMO-1002</a> (processing), or <a href="/?order_id=DEMO-1003">DEMO-1003</a> (delivered).</p></form>{result}</div>
-<footer>Fictional orders only. AI interprets questions; order facts come from records. The order ID form uses direct lookup without AI. No refunds or order changes are performed.</footer>
+<footer>Fictional orders only. AI interprets questions; order facts come from records. The order ID form uses direct lookup without AI. <a href="/reviews">Cancellation review sandbox</a>: submit and manually review cancellation requests. No real orders are changed.</footer>
 </main></body></html>'''.encode("utf-8")

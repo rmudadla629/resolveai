@@ -9,7 +9,17 @@ DATA_PATH = Path(__file__).resolve().parent.parent / "data" / "orders.json"
 def lookup_order(order_id: str) -> dict | None:
     normalized = order_id.strip().upper()
     orders = json.loads(DATA_PATH.read_text(encoding="utf-8"))
-    return next((order for order in orders if order["order_id"] == normalized), None)
+    order = next((order for order in orders if order["order_id"] == normalized), None)
+    from . import reviews
+    if order and reviews.DB_PATH.exists():
+        db = reviews.connect()
+        try:
+            override = db.execute("SELECT status FROM overrides WHERE order_id=?", (normalized,)).fetchone()
+            if override:
+                order["status"] = override["status"]
+        finally:
+            db.close()
+    return order
 
 
 def answer_order(order_id: str) -> tuple[int, dict]:
