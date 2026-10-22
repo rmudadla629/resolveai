@@ -106,7 +106,7 @@ class RequestDispatcher:
                 return 404, {"mode": "local_ai", "outcome": "not_found", "message": "No accessible demo order was found."}
             return answer_question(text, allowed_order_ids=customers.OWNERSHIP.get(username, ()))
         status, body = traced_answer(question, scoped_answer)
-        self.respond(status, render_page(question=question, ai_body=body), "text/html; charset=utf-8")
+        self.respond(status, render_page(question=question, ai_body=body, username=username), "text/html; charset=utf-8")
 
     def do_GET(self):
         url = urlsplit(self.path)
@@ -130,7 +130,7 @@ class RequestDispatcher:
             order_id = params.get("order_id", [None])[0]
             if order_id is not None and not self.order_access(order_id):
                 return
-            self.respond(200, render_page(order_id), "text/html; charset=utf-8")
+            self.respond(200, render_page(order_id, username=customers.identity(self.headers.get("Cookie"))), "text/html; charset=utf-8")
             return
         if url.path == "/health":
             status, body = 200, {"status": "ok", "mode": "deterministic_demo"}

@@ -73,7 +73,7 @@ Question form → local model intent/ID extraction → application validation �
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-Fifty-seven tests cover order statuses, input normalization, missing and unknown IDs, HTML escaping, HTTP form/API responses, invented model IDs, unsupported requests, input limits, model failures, and evaluation scoring. Automated model tests use mocks; these verify application behavior rather than model accuracy.
+Fifty-eight tests cover order statuses, input normalization, missing and unknown IDs, HTML escaping, HTTP form/API responses, invented model IDs, unsupported requests, input limits, model failures, and evaluation scoring. Automated model tests use mocks; these verify application behavior rather than model accuracy.
 
 ## Live model evaluation
 
@@ -206,3 +206,9 @@ The 22-case set covers paraphrases, unknown policies, action requests, multiple 
 Reports include category counts, dataset hash, workflow/policy source hash, repetitions, responses, and latency. The baseline passed 15/22; after clearer routing priorities and damaged-product vocabulary, two runs passed 20/22 each (40/44 attempts). That revision still had two failures. A later contrastive prompt update resolved both on the challenge set: 22/22 passed in each of two runs (44/44 attempts), and the original 18 scenarios passed. Chat still performs no cancellation actions. See the preserved reports and evaluation limitations in CHALLENGE_RESULTS.md.
 
 Retrieval-only comparison now scores keyword 6/10 and semantic fallback 10/10 on the existing tuned set. The faulty-product question now retrieves correctly when routed to policies. These are development improvements, not production accuracy guarantees. See [Challenge results](CHALLENGE_RESULTS.md) for preserved evidence.
+
+## Support interface behavior
+
+With JavaScript enabled, AI form submission displays Checking…, disables its submit button, suppresses repeat submissions from that page while pending, and replaces the response area without navigation. It hides the previous answer while a new request runs and preserves the question if response loading fails. Network timeout guidance notes that processing may continue; there is no automatic retry or server-side deduplication. Native form submission remains available without JavaScript.
+
+The header links to customer sign-in/account, policies, and reviewer sign-in. Order examples appear only for the signed-in customer's mapped orders, using current saved statuses. General policy questions remain available while signed out. Frontend behavior was manually verified in the local browser; automated tests cover server behavior and status/ownership-aware links.

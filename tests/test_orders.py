@@ -12,6 +12,17 @@ from tests.support import IsolatedOrderTestCase
 
 
 class OrderTests(IsolatedOrderTestCase):
+    def test_examples_follow_saved_status_and_customer_ownership(self):
+        from resolveai.reviews import submit, decide
+        submit("DEMO-1002")
+        decide(1, "approve")
+        page = render_page(username="alex").decode()
+        self.assertIn('DEMO-1002</a> (cancelled)', page)
+        self.assertNotIn('DEMO-1002</a> (processing)', page)
+        self.assertNotIn('href="/?order_id=DEMO-1003"', page)
+        guest = render_page().decode()
+        self.assertNotIn('href="/?order_id=DEMO-1001"', guest)
+
     def test_interface_results_and_escaping(self):
         self.assertIn("is shipped", render_page("DEMO-1001").decode())
         self.assertIn("No matching demo order", render_page("DEMO-9999").decode())
