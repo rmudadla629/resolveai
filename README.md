@@ -71,7 +71,7 @@ Question form → local model intent/ID extraction → application validation �
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-Forty-seven tests cover order statuses, input normalization, missing and unknown IDs, HTML escaping, HTTP form/API responses, invented model IDs, unsupported requests, input limits, model failures, and evaluation scoring. Automated model tests use mocks; these verify application behavior rather than model accuracy.
+Fifty-two tests cover order statuses, input normalization, missing and unknown IDs, HTML escaping, HTTP form/API responses, invented model IDs, unsupported requests, input limits, model failures, and evaluation scoring. Automated model tests use mocks; these verify application behavior rather than model accuracy.
 
 ## Live model evaluation
 
@@ -145,7 +145,7 @@ Create the reviewer password once, using a separate terminal tab:
 
 Enter and confirm a password of at least 12 characters. Input is hidden. A salted PBKDF2 hash is stored in ignored `runtime/reviewer.json`; the plaintext password is not stored. The setup command refuses to overwrite an existing account. No password reset flow is implemented yet.
 
-Restart ResolveAI, open `/reviews`, and sign in. Reviewer sessions expire after one hour, are invalidated at server restart, and can be ended with Sign out. Cookies use HttpOnly and SameSite=Strict. Secure cookies/TLS, login throttling, password recovery, multiple reviewers, and deployment validation remain delivery gates. This authentication is for localhost only. The trace page remains unauthenticated; order lookup requires customer sign-in.
+Restart ResolveAI, open `/reviews`, and sign in. Reviewer sessions expire after one hour, are invalidated at server restart, and can be ended with Sign out. Cookies use HttpOnly and SameSite=Strict. Secure cookies/TLS, password recovery, multiple reviewers, and deployment validation remain delivery gates; local login attempt limits are implemented. This authentication is for localhost only. The trace page remains unauthenticated; order lookup requires customer sign-in.
 
 ## Customer accounts and ownership
 
@@ -169,10 +169,18 @@ Already-cancelled DEMO-1002 remains cancelled; setup does not reset sandbox stat
 
 The app and server limit request bodies to 8 KiB. Responses prevent browser caching and include frame denial and MIME-sniffing protections. Unexpected route errors return a generic 500 without exposing exception details. `/health` checks the HTTP application only, not Ollama or database readiness. CI installs `requirements.txt` before testing. Tests include a real Waitress HTTP smoke check.
 
-Keep the localhost default. A deployment-ready server alone does not establish public readiness: HTTPS/Secure cookies, login throttling, deployment secrets/configuration, durable session storage, and operational validation remain unfinished. Sessions and the form token are process-local; use one process and expect sign-in again after restarting. Models still run through local Ollama. No hosting was created or purchased.
+Keep the localhost default. A deployment-ready server alone does not establish public readiness: HTTPS/Secure cookies, shared deployment rate limiting, deployment secrets/configuration, durable session storage, and operational validation remain unfinished. Sessions and the form token are process-local; use one process and expect sign-in again after restarting. Models still run through local Ollama. No hosting was created or purchased.
 
 ## Demo utilities
 
 Run `.venv/bin/python -m resolveai.doctor` for read-only checks of Python, installed server dependencies, account configuration presence, and local Ollama models. It does not reveal passwords or validate model accuracy.
 
 Run `.venv/bin/python -m resolveai.demo` for a no-change reset preview. Only after stopping the server, use `--server-stopped --confirm RESET-DEMO` to back up review/trace databases and clear fictional activity. Credentials and JSON fixtures are preserved. The command relies on the operator to stop the server. See [Demo guide](DEMO.md) before resetting. Runtime databases and backups stay excluded from Git.
+
+## Login attempt limits
+
+Reviewer (`POST /login`) and customer (`POST /customer/login`) sign-ins each allow five attempts per connection IP in a fixed 60-second window. The sixth attempt returns HTTP 429 with a Retry-After header and retry guidance before checking a password. Successful, failed, and invalid-token submissions count; success does not reset the counter. Requests recover automatically when the window ends. No password or username is retained by the limiter.
+
+Limits are role-endpoint/IP based rather than account based: switching customer usernames does not bypass the limit, while reviewer and customer windows are separate. Multiple people sharing an IP share that endpoint's budget. The local thread-safe store is bounded to 4,096 active keys. When full, new keys are temporarily blocked until a window expires; active limits are not evicted. Forwarded IP headers are not trusted. Logout, order lookup, policy questions, and health checks are not limited by this feature.
+
+Counters are in memory, clear on server restart, and apply only to one process. Public deployments need a trusted proxy/IP policy and shared limits across processes. These controls do not establish protection against distributed attacks or denial of service. Local automated tests use simulated time to verify blocking and recovery without making the user wait.

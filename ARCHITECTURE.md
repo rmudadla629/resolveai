@@ -44,7 +44,7 @@ CI uses temporary databases and mocked model calls. Separate live evaluations us
 - Exact excerpts provide citations but not personalized eligibility decisions.
 - Keyword-first search is not weighted hybrid ranking; keyword collisions and semantic false negatives remain possible.
 - Three policy sections do not require a vector database. Larger corpora need ingestion, chunking, indexing, and access-aware retrieval.
-- Waitress-served Flask application with local reviewer sign-in, but without rate limiting, deployment configuration, or load validation.
+- Waitress-served Flask application with local reviewer sign-in, but with per-process login limits, but without shared deployment rate limiting or load validation.
 - Request-level metrics, without model spans, token counts, or accuracy measurement.
 
 ## Delivery gates
@@ -53,3 +53,7 @@ CI uses temporary databases and mocked model calls. Separate live evaluations us
 2. Deployment-ready application server, configuration, consistent error handling, request limits, and operational checks.
 3. Independent evaluations with paraphrases, negative examples, mixed intents, repeated runs, and category metrics.
 4. Reproducible deployment and a walkthrough documenting measured capabilities and limitations.
+
+## Sign-in attempt protection
+
+A Flask before-request hook reserves an attempt before credential verification. Separate reviewer/customer endpoint windows use the actual connection IP, with five attempts in 60 seconds. Over-limit responses return 429 and Retry-After. Thread locking prevents parallel attempts from exceeding the budget; expired entries are removed and active storage is bounded. Forwarding headers are ignored. This local single-process implementation needs shared storage and a trusted proxy policy before distributed deployment.

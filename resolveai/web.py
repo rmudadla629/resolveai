@@ -15,6 +15,7 @@ from .review_interface import render_reviews
 from .reviews import submit, decide
 from .tracing import traced_answer, render_traces
 from . import auth, customers
+from . import login_limits
 
 REVIEW_TOKEN = secrets.token_urlsafe(32)
 
@@ -168,6 +169,18 @@ class RequestDispatcher:
 
 app = Flask(__name__)
 app.config.update(MAX_CONTENT_LENGTH=8192, DEBUG=False)
+
+
+@app.before_request
+def limit_login_attempts():
+    if request.method == 'POST' and request.path in ('/login', '/customer/login'):
+        # Use the connection address only. User-supplied forwarding headers are not trusted.
+        retry = login_limits.limiter.check((request.path, request.remote_addr or 'unknown'))
+        if retry:
+            response = Response(f'Too many sign-in attempts. Try again in {retry} seconds.',
+                                status=429, content_type='text/plain; charset=utf-8')
+            response.headers['Retry-After'] = str(retry)
+            return response
 
 
 @app.route('/', defaults={'path': ''}, methods=['GET', 'POST'])

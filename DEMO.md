@@ -67,7 +67,7 @@ Backups remain local and are not automatically deleted. To recover a database, s
 
 The automated suite uses temporary databases and mocked models. The live evaluations call Ollama, write reports, and do not reset your demo database. Development benchmark scores are not production accuracy estimates. See ARCHITECTURE.md and PROJECT_REVIEW.md for design choices and known gaps.
 
-This is a localhost demo. Public deployment still needs HTTPS, Secure cookies, login throttling, durable session handling, and operational validation. Do not expose it through a public tunnel as part of this walkthrough.
+This is a localhost demo. Public deployment still needs HTTPS, Secure cookies, shared rate limiting, durable session handling, and operational validation. Do not expose it through a public tunnel as part of this walkthrough.
 
 ## Troubleshooting
 
@@ -77,3 +77,7 @@ This is a localhost demo. Public deployment still needs HTTPS, Secure cookies, l
 - Model unavailable: keep Ollama open and run the model pull commands above if needed.
 - Expected order is cancelled: prior approval was saved. Reset only if you want fresh demo state.
 - Yellow Actions icon: refresh the run page and inspect the job rather than pushing again.
+
+## Sign-in retry behavior
+
+If you see “Too many sign-in attempts,” wait the number of seconds shown and try again. Each role endpoint allows five attempts per IP in a 60-second window, including successful sign-ins. This does not delete or lock the account permanently. Existing sessions and non-login pages are unaffected. No need to deliberately enter incorrect passwords for the walkthrough: automated tests verify limits and recovery.
