@@ -3,9 +3,10 @@ from unittest.mock import patch
 from urllib.error import URLError
 
 from resolveai.agent import answer_question
+from tests.support import IsolatedOrderTestCase
 
 
-class AgentTests(unittest.TestCase):
+class AgentTests(IsolatedOrderTestCase):
     @patch("resolveai.agent.classify")
     def test_order_lookup_and_missing_record(self, model):
         for order_id, status in [("DEMO-1001", 200), ("DEMO-9999", 404)]:

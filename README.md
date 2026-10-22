@@ -102,3 +102,7 @@ Open `/reviews` to submit a processing demo order (such as `DEMO-1002`) for revi
 SQLite transactions persist requests, status overrides, and audit events under ignored `runtime/reviews.sqlite3`. JSON order fixtures remain unchanged. Audit timestamps are UTC; no reviewer identity is recorded. The page includes a form token to reject blind cross-site submissions, but there is no login or role separation. Anyone with local app access can review requests. Keep the service on localhost; this is not production authorization or real order integration. AI chat does not submit or approve requests; use the explicit form.
 
 Live model evaluations use isolated order fixtures so manual cancellations do not affect benchmark results. The tests use temporary databases and do not change the local sandbox.
+
+## Continuous integration
+
+The `Tests` GitHub Actions workflow runs the regression suite on pushes and pull requests using Python 3.12 on Ubuntu. It can also be started manually from the repository's Actions tab. The workflow uses mocked model responses; it does not install Ollama or run the live model benchmark. No API keys are required. Order and agent tests isolate their database so local cancellations cannot change their expected results.

@@ -9,9 +9,10 @@ from unittest.mock import patch
 from resolveai.__main__ import Handler
 from resolveai.orders import answer_order
 from resolveai.interface import render_page
+from tests.support import IsolatedOrderTestCase
 
 
-class OrderTests(unittest.TestCase):
+class OrderTests(IsolatedOrderTestCase):
     def test_interface_results_and_escaping(self):
         self.assertIn("is shipped", render_page("DEMO-1001").decode())
         self.assertIn("No matching demo order", render_page("DEMO-9999").decode())
