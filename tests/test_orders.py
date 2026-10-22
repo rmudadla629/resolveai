@@ -1,0 +1,48 @@
+import json
+import threading
+import unittest
+from http.server import ThreadingHTTPServer
+from urllib.error import HTTPError
+from urllib.request import urlopen
+
+from resolveai.__main__ import Handler
+from resolveai.orders import answer_order
+
+
+class OrderTests(unittest.TestCase):
+    def test_known_statuses(self):
+        for order_id, expected in [("DEMO-1001", "shipped"), ("DEMO-1002", "processing"), ("DEMO-1003", "delivered")]:
+            with self.subTest(order_id=order_id):
+                status, body = answer_order(order_id)
+                self.assertEqual(status, 200)
+                self.assertEqual(body["order"]["status"], expected)
+                self.assertIn(expected, body["message"])
+
+    def test_normalization(self):
+        self.assertEqual(answer_order(" demo-1001 ")[0], 200)
+
+    def test_unknown_has_no_invented_record(self):
+        status, body = answer_order("DEMO-9999")
+        self.assertEqual(status, 404)
+        self.assertNotIn("order", body)
+        self.assertNotIn("source", body)
+
+    def test_blank_requests_order_id(self):
+        self.assertEqual(answer_order(" ")[0], 400)
+
+    def test_http_contract(self):
+        with ThreadingHTTPServer(("127.0.0.1", 0), Handler) as server:
+            worker = threading.Thread(target=server.serve_forever, daemon=True)
+            worker.start()
+            base = f"http://127.0.0.1:{server.server_port}"
+            try:
+                with urlopen(base + "/api/order-status?order_id=DEMO-1001", timeout=2) as response:
+                    self.assertEqual(response.status, 200)
+                    self.assertEqual(json.load(response)["order"]["status"], "shipped")
+                for path, code in [("/api/order-status", 400), ("/api/order-status?order_id=UNKNOWN", 404), ("/missing", 404)]:
+                    with self.assertRaises(HTTPError) as error:
+                        urlopen(base + path, timeout=2)
+                    self.assertEqual(error.exception.code, code)
+            finally:
+                server.shutdown()
+                worker.join()

@@ -1,0 +1,5 @@
+[
+  {"order_id": "DEMO-1001", "status": "shipped", "item": "Wireless keyboard", "tracking_id": "DEMO-TRACK-1001"},
+  {"order_id": "DEMO-1002", "status": "processing", "item": "USB-C hub", "tracking_id": null},
+  {"order_id": "DEMO-1003", "status": "delivered", "item": "Laptop stand", "tracking_id": "DEMO-TRACK-1003"}
+]

@@ -1,0 +1,1 @@
+"""ResolveAI fictional support service."""
