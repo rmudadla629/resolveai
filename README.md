@@ -65,7 +65,19 @@ Question form → local model intent/ID extraction → application validation �
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-Twelve tests cover order statuses, input normalization, missing and unknown IDs, HTML escaping, HTTP form/API responses, invented model IDs, unsupported requests, input limits, and model failures. Automated model tests use mocks; these verify application behavior rather than model accuracy.
+Fourteen tests cover order statuses, input normalization, missing and unknown IDs, HTML escaping, HTTP form/API responses, invented model IDs, unsupported requests, input limits, model failures, and evaluation scoring. Automated model tests use mocks; these verify application behavior rather than model accuracy.
+
+## Live model evaluation
+
+Keep Ollama running and execute:
+
+```sh
+.venv/bin/python -m resolveai.evaluate
+```
+
+The runner checks 12 labeled development scenarios in `data/eval_questions.json`: known and unknown orders, lowercase IDs, missing and multiple IDs, unsupported actions, unrelated questions, and an instruction override attempt. It checks structured outcomes, HTTP status, record identity/status, and source references. It reports pass rate, mean latency, p95 latency, and each response in a timestamped JSON file under `reports/`. Any failed case produces a nonzero exit code. No paid API is used.
+
+This is a small development benchmark with one run per case. It is not a held-out accuracy estimate or proof of general safety. Generated-response quality is not measured because final order facts use fixed templates. Larger independent test sets and repeated runs are needed before making broader reliability claims.
 
 ## Development roadmap
 
