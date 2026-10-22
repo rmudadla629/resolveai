@@ -26,6 +26,10 @@ def render_page(order_id: str | None = None, question: str = "", ai_body: dict |
             source += f'<blockquote><p>{escape(citation["excerpt"])}</p><a href="/policies#{escape(citation["id"], quote=True)}">Source: {escape(citation["title"])}</a></blockquote>'
         if "retrieval_method" in ai_body:
             source += f'<p class="source">Search method: {escape(ai_body["retrieval_method"])}</p>'
+        if "trace_id" in ai_body:
+            source += f'<p class="source">Trace ID: {escape(ai_body["trace_id"])} · <a href="/traces">View request traces</a></p>'
+            if not ai_body.get("trace_saved"):
+                source += '<p class="source">Trace storage is unavailable; this request was not saved.</p>'
         ai_result = f'<section class="result" role="status"><h2>Support response</h2><p>{escape(ai_body["message"])}</p>{source}</section>'
     return f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8">

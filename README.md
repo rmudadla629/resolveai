@@ -65,7 +65,7 @@ Question form → local model intent/ID extraction → application validation �
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-Twenty-eight tests cover order statuses, input normalization, missing and unknown IDs, HTML escaping, HTTP form/API responses, invented model IDs, unsupported requests, input limits, model failures, and evaluation scoring. Automated model tests use mocks; these verify application behavior rather than model accuracy.
+Thirty-two tests cover order statuses, input normalization, missing and unknown IDs, HTML escaping, HTTP form/API responses, invented model IDs, unsupported requests, input limits, model failures, and evaluation scoring. Automated model tests use mocks; these verify application behavior rather than model accuracy.
 
 ## Live model evaluation
 
@@ -120,3 +120,11 @@ Live model evaluations use isolated order fixtures so manual cancellations do no
 ## Continuous integration
 
 The `Tests` GitHub Actions workflow runs the regression suite on pushes and pull requests using Python 3.12 on Ubuntu. It can also be started manually from the repository's Actions tab. The workflow uses mocked model responses; it does not install Ollama or run the live model benchmark. No API keys are required. Order and agent tests isolate their database so local cancellations cannot change their expected results.
+
+## Local request tracing
+
+AI question submissions through `/ask` receive a unique trace ID and record metadata in ignored `runtime/traces.sqlite3`. Open `/traces` or follow the response link to inspect the latest 100 requests and summary metrics over up to 1,000 retained records. Stored fields are trace ID, UTC timestamp, HTTP status, outcome, tool, retrieval method, and processing duration. Prompts, order IDs, response text, and exception text are not stored in this trace database. HTTP access logs and browser history are separate from tracing.
+
+Duration includes routing and retrieval, but not form parsing, rendering, or network delivery. Metrics count HTTP 5xx as server/model errors; they do not measure answer accuracy, token usage, or cost. Direct order forms, review actions, and command-line evaluations are not included. Trace storage failure leaves the response usable and displays a warning. Unexpected processing exceptions return a generic error and record an internal-error outcome when storage is available.
+
+This is local request-level instrumentation, not distributed tracing or model-level spans. The trace page has no sign-in; keep the service on localhost.

@@ -10,6 +10,7 @@ from .interface import render_page, render_policies
 from .agent import answer_question
 from .review_interface import render_reviews
 from .reviews import submit, decide
+from .tracing import traced_answer, render_traces
 
 REVIEW_TOKEN = secrets.token_urlsafe(32)
 
@@ -45,11 +46,14 @@ class Handler(BaseHTTPRequestHandler):
             self.respond(200, render_reviews(REVIEW_TOKEN, message), "text/html; charset=utf-8")
             return
         question = form.get("question", [""])[0]
-        status, body = answer_question(question)
+        status, body = traced_answer(question, answer_question)
         self.respond(status, render_page(question=question, ai_body=body), "text/html; charset=utf-8")
 
     def do_GET(self):
         url = urlsplit(self.path)
+        if url.path == "/traces":
+            self.respond(200, render_traces(), "text/html; charset=utf-8")
+            return
         if url.path == "/reviews":
             self.respond(200, render_reviews(REVIEW_TOKEN), "text/html; charset=utf-8")
             return
