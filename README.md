@@ -26,6 +26,8 @@ The question router calls `http://127.0.0.1:11434/api/chat`, with thinking disab
 
 ## Quick start
 
+Portfolio materials: [three-minute demo script](DEMO_SCRIPT.md), [resume bullets](RESUME.md), and [interview preparation](INTERVIEW_GUIDE.md). The video has not been recorded and no public app URL is available yet.
+
 For an isolated local container setup, see [Container guide](CONTAINERS.md). Its build/start verification runs in GitHub Actions; full Compose inference needs a separate local test.
 
 See [Demo guide](DEMO.md) for first-time setup, a five-minute walkthrough, troubleshooting, and a confirmed reset that preserves account credentials.
