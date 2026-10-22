@@ -7,9 +7,17 @@ from urllib.request import urlopen
 
 from resolveai.__main__ import Handler
 from resolveai.orders import answer_order
+from resolveai.interface import render_page
 
 
 class OrderTests(unittest.TestCase):
+    def test_interface_results_and_escaping(self):
+        self.assertIn("is shipped", render_page("DEMO-1001").decode())
+        self.assertIn("No matching demo order", render_page("DEMO-9999").decode())
+        self.assertIn("Please supply", render_page("").decode())
+        self.assertNotIn("<script>", render_page('<script>"</script>').decode())
+        self.assertNotIn("Order found", render_page().decode())
+
     def test_known_statuses(self):
         for order_id, expected in [("DEMO-1001", "shipped"), ("DEMO-1002", "processing"), ("DEMO-1003", "delivered")]:
             with self.subTest(order_id=order_id):
@@ -36,6 +44,9 @@ class OrderTests(unittest.TestCase):
             worker.start()
             base = f"http://127.0.0.1:{server.server_port}"
             try:
+                with urlopen(base + "/?order_id=DEMO-1002", timeout=2) as response:
+                    self.assertIn("text/html", response.headers["Content-Type"])
+                    self.assertIn("is processing", response.read().decode())
                 with urlopen(base + "/api/order-status?order_id=DEMO-1001", timeout=2) as response:
                     self.assertEqual(response.status, 200)
                     self.assertEqual(json.load(response)["order"]["status"], "shipped")
