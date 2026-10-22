@@ -53,6 +53,9 @@ class ReviewTests(unittest.TestCase):
         self.assertEqual(lookup_order("DEMO-1002")["status"], "shipped")
 
     def test_review_http_token_and_submission(self):
+        patcher = patch("resolveai.__main__.auth.authorized", return_value=True)
+        patcher.start()
+        self.addCleanup(patcher.stop)
         with ThreadingHTTPServer(("127.0.0.1", 0), Handler) as server:
             worker = threading.Thread(target=server.serve_forever, daemon=True)
             worker.start()

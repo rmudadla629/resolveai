@@ -67,7 +67,7 @@ Question form → local model intent/ID extraction → application validation �
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-Thirty-two tests cover order statuses, input normalization, missing and unknown IDs, HTML escaping, HTTP form/API responses, invented model IDs, unsupported requests, input limits, model failures, and evaluation scoring. Automated model tests use mocks; these verify application behavior rather than model accuracy.
+Thirty-six tests cover order statuses, input normalization, missing and unknown IDs, HTML escaping, HTTP form/API responses, invented model IDs, unsupported requests, input limits, model failures, and evaluation scoring. Automated model tests use mocks; these verify application behavior rather than model accuracy.
 
 ## Live model evaluation
 
@@ -115,7 +115,7 @@ The first local run scored keyword retrieval 5/10 and keyword-first semantic fal
 
 Open `/reviews` to submit a processing demo order (such as `DEMO-1002`) for review. Submission does not change the order. Approve or reject the pending request using the review buttons. Approval rechecks eligibility and changes only the fictional order status to `cancelled`; rejection leaves it unchanged. Shipped, delivered, unknown, and already cancelled orders are blocked. Pending requests are deduplicated and decisions cannot be applied twice.
 
-SQLite transactions persist requests, status overrides, and audit events under ignored `runtime/reviews.sqlite3`. JSON order fixtures remain unchanged. Audit timestamps are UTC; no reviewer identity is recorded. The page includes a form token to reject blind cross-site submissions, but there is no login or role separation. Anyone with local app access can review requests. Keep the service on localhost; this is not production authorization or real order integration. AI chat does not submit or approve requests; use the explicit form.
+SQLite transactions persist requests, status overrides, and audit events under ignored `runtime/reviews.sqlite3`. JSON order fixtures remain unchanged. Audit timestamps are UTC; no reviewer identity is recorded. The page includes a form token to reject blind cross-site submissions, and reviewer sign-in is required; customer role separation is not implemented. Review controls require the configured local reviewer password. Keep the service on localhost; this is not production authorization or real order integration. AI chat does not submit or approve requests; use the explicit form.
 
 Live model evaluations use isolated order fixtures so manual cancellations do not affect benchmark results. The tests use temporary databases and do not change the local sandbox.
 
@@ -130,3 +130,15 @@ AI question submissions through `/ask` receive a unique trace ID and record meta
 Duration includes routing and retrieval, but not form parsing, rendering, or network delivery. Metrics count HTTP 5xx as server/model errors; they do not measure answer accuracy, token usage, or cost. Direct order forms, review actions, and command-line evaluations are not included. Trace storage failure leaves the response usable and displays a warning. Unexpected processing exceptions return a generic error and record an internal-error outcome when storage is available.
 
 This is local request-level instrumentation, not distributed tracing or model-level spans. The trace page has no sign-in; keep the service on localhost.
+
+## Local reviewer sign-in
+
+Create the reviewer password once, using a separate terminal tab:
+
+```sh
+.venv/bin/python -m resolveai.auth
+```
+
+Enter and confirm a password of at least 12 characters. Input is hidden. A salted PBKDF2 hash is stored in ignored `runtime/reviewer.json`; the plaintext password is not stored. The setup command refuses to overwrite an existing account. No password reset flow is implemented yet.
+
+Restart ResolveAI, open `/reviews`, and sign in. Reviewer sessions expire after one hour, are invalidated at server restart, and can be ended with Sign out. Cookies use HttpOnly and SameSite=Strict. Secure cookies/TLS, login throttling, customer ownership, multiple reviewers, and identity-bearing audit records remain deployment gates. This authentication is for localhost only. The trace page and demo order lookup remain unauthenticated.

@@ -11,13 +11,17 @@ from .agent import answer_question
 from .review_interface import render_reviews
 from .reviews import submit, decide
 from .tracing import traced_answer, render_traces
+from . import auth
 
 REVIEW_TOKEN = secrets.token_urlsafe(32)
 
 
 class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
-        if self.path not in ("/ask", "/reviews/submit", "/reviews/decide"):
+        if self.path.startswith("/reviews/") and not auth.authorized(self.headers.get("Cookie")):
+            self.respond(401, auth.render_login(REVIEW_TOKEN, "Sign in to access review controls."), "text/html; charset=utf-8")
+            return
+        if self.path not in ("/ask", "/reviews/submit", "/reviews/decide", "/login", "/logout"):
             self.respond(404, b'Endpoint not found.', "text/plain; charset=utf-8")
             return
         try:
@@ -29,6 +33,20 @@ class Handler(BaseHTTPRequestHandler):
             form = parse_qs(self.rfile.read(size).decode("utf-8"))
         except (ValueError, UnicodeError):
             self.respond(400, b'Invalid form submission.', "text/plain; charset=utf-8")
+            return
+        if self.path in ("/login", "/logout"):
+            if not secrets.compare_digest(form.get("token", [""])[0], REVIEW_TOKEN):
+                self.respond(403, b'Invalid form token.', "text/plain")
+                return
+            if self.path == "/logout":
+                auth.logout(self.headers.get("Cookie"))
+                self.redirect("/reviews", "resolveai_reviewer=; Max-Age=0; Path=/; HttpOnly; SameSite=Strict")
+                return
+            session = auth.login(form.get("password", [""])[0])
+            if session is None:
+                self.respond(401, auth.render_login(REVIEW_TOKEN, "Sign-in failed."), "text/html; charset=utf-8")
+                return
+            self.redirect("/reviews", f"resolveai_reviewer={session}; Max-Age=3600; Path=/; HttpOnly; SameSite=Strict")
             return
         if self.path.startswith("/reviews/"):
             if not secrets.compare_digest(form.get("token", [""])[0], REVIEW_TOKEN):
@@ -55,6 +73,9 @@ class Handler(BaseHTTPRequestHandler):
             self.respond(200, render_traces(), "text/html; charset=utf-8")
             return
         if url.path == "/reviews":
+            if not auth.authorized(self.headers.get("Cookie")):
+                self.respond(200, auth.render_login(REVIEW_TOKEN), "text/html; charset=utf-8")
+                return
             self.respond(200, render_reviews(REVIEW_TOKEN), "text/html; charset=utf-8")
             return
         if url.path == "/policies":
@@ -79,8 +100,17 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(status)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(payload)))
+        self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(payload)
+
+    def redirect(self, location, cookie):
+        self.send_response(303)
+        self.send_header("Location", location)
+        self.send_header("Set-Cookie", cookie)
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Content-Length", "0")
+        self.end_headers()
 
 
 if __name__ == "__main__":

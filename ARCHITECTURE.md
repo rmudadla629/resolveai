@@ -30,7 +30,7 @@ Question requests receive trace IDs and record status, outcome, tool, retrieval 
 
 AI cannot change an order. A separate form creates pending requests only for processing orders. SQLite transactions persist decisions, status overrides, and audit events. A unique index deduplicates pending requests. Approval rechecks eligibility, and completed requests cannot be decided twice.
 
-A process-local form token is not authentication. Anyone with local access can approve requests. Customer ownership and reviewer identities are not implemented.
+A process-local form token is not authentication. A single local reviewer account gates approval; customer ownership is not implemented. Customer ownership and reviewer identities are not implemented.
 
 ## Persistence and validation
 
@@ -44,7 +44,7 @@ CI uses temporary databases and mocked model calls. Separate live evaluations us
 - Exact excerpts provide citations but not personalized eligibility decisions.
 - Keyword-first search is not weighted hybrid ranking; keyword collisions and semantic false negatives remain possible.
 - Three policy sections do not require a vector database. Larger corpora need ingestion, chunking, indexing, and access-aware retrieval.
-- Development HTTP server, without login, rate limiting, deployment configuration, or load validation.
+- Development HTTP server with local reviewer sign-in, but without customer login, rate limiting, deployment configuration, or load validation.
 - Request-level metrics, without model spans, token counts, or accuracy measurement.
 
 ## Delivery gates
