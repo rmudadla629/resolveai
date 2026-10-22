@@ -7,6 +7,7 @@ from urllib.request import urlopen
 
 from . import auth, customers
 from .embeddings import MODEL
+from .config import ollama_url
 
 
 def checks():
@@ -25,7 +26,7 @@ def checks():
     for name in ("alex", "sam"):
         results.append((f"Customer {name} configured", isinstance(configured, dict) and name in configured))
     try:
-        with urlopen("http://127.0.0.1:11434/api/tags", timeout=5) as response:
+        with urlopen(ollama_url("/api/tags"), timeout=5) as response:
             models = {m["name"] for m in json.load(response)["models"]}
         results.append(("Ollama reachable", True))
     except (OSError, ValueError, KeyError, TypeError):

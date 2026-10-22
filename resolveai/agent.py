@@ -7,6 +7,7 @@ from urllib.request import Request, urlopen
 
 from .orders import answer_order
 from .policies import answer_policy
+from .config import ollama_url
 
 SCHEMA = {
     "type": "object",
@@ -31,7 +32,7 @@ def classify(question: str) -> dict:
             {"role": "user", "content": question},
         ],
     }
-    request = Request("http://127.0.0.1:11434/api/chat", data=json.dumps(payload).encode(),
+    request = Request(ollama_url("/api/chat"), data=json.dumps(payload).encode(),
                       headers={"Content-Type": "application/json"}, method="POST")
     with urlopen(request, timeout=90) as response:
         result = json.load(response)

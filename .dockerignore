@@ -1,0 +1,10 @@
+**
+!requirements.txt
+!resolveai/
+!resolveai/**
+!data/
+!data/**
+!tests/
+!tests/**
+**/__pycache__/
+**/*.pyc

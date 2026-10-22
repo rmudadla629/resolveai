@@ -26,6 +26,8 @@ The question router calls `http://127.0.0.1:11434/api/chat`, with thinking disab
 
 ## Quick start
 
+For an isolated local container setup, see [Container guide](CONTAINERS.md). Its build/start verification runs in GitHub Actions; full Compose inference needs a separate local test.
+
 See [Demo guide](DEMO.md) for first-time setup, a five-minute walkthrough, troubleshooting, and a confirmed reset that preserves account credentials.
 
 Requires Python 3.12. Install the pinned application dependencies; no API keys are needed.
@@ -71,7 +73,7 @@ Question form → local model intent/ID extraction → application validation �
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-Fifty-two tests cover order statuses, input normalization, missing and unknown IDs, HTML escaping, HTTP form/API responses, invented model IDs, unsupported requests, input limits, model failures, and evaluation scoring. Automated model tests use mocks; these verify application behavior rather than model accuracy.
+Fifty-four tests cover order statuses, input normalization, missing and unknown IDs, HTML escaping, HTTP form/API responses, invented model IDs, unsupported requests, input limits, model failures, and evaluation scoring. Automated model tests use mocks; these verify application behavior rather than model accuracy.
 
 ## Live model evaluation
 
@@ -184,3 +186,9 @@ Reviewer (`POST /login`) and customer (`POST /customer/login`) sign-ins each all
 Limits are role-endpoint/IP based rather than account based: switching customer usernames does not bypass the limit, while reviewer and customer windows are separate. Multiple people sharing an IP share that endpoint's budget. The local thread-safe store is bounded to 4,096 active keys. When full, new keys are temporarily blocked until a window expires; active limits are not evicted. Forwarded IP headers are not trusted. Logout, order lookup, policy questions, and health checks are not limited by this feature.
 
 Counters are in memory, clear on server restart, and apply only to one process. Public deployments need a trusted proxy/IP policy and shared limits across processes. These controls do not establish protection against distributed attacks or denial of service. Local automated tests use simulated time to verify blocking and recovery without making the user wait.
+
+## Container packaging
+
+`Dockerfile` packages Flask/Waitress as a non-root application. `compose.yaml` publishes the app on localhost port 8001, uses private service networking for Ollama, and persists runtime state, reports, and model files in named volumes. The build context excludes local credentials and databases. `RESOLVEAI_OLLAMA_URL` supports the internal model service without changing the native localhost default.
+
+The CI container job validates Compose, builds the image, runs regression tests inside it, and checks server health without downloading models. Full Compose inference and native ARM container execution require separate verification. Docker was not installed locally when this packaging was prepared. See [Container guide](CONTAINERS.md) for setup and verification limits.

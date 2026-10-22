@@ -1,0 +1,28 @@
+services:
+  app:
+    build: .
+    ports:
+      - "127.0.0.1:8001:8000"
+    environment:
+      RESOLVEAI_OLLAMA_URL: http://ollama:11434
+    volumes:
+      - demo-state:/app/runtime
+      - demo-reports:/app/reports
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      - ollama
+  ollama:
+    image: ollama/ollama:0.40.8
+    volumes:
+      - models:/root/.ollama
+    # No published Ollama port: only the internal Compose network can reach it.
+volumes:
+  demo-state:
+  demo-reports:
+  models:

@@ -4,12 +4,13 @@ import json
 import math
 from functools import lru_cache
 from urllib.request import Request, urlopen
+from .config import ollama_url
 
 MODEL = "all-minilm:22m"
 
 
 def embed(texts):
-    request = Request("http://127.0.0.1:11434/api/embed",
+    request = Request(ollama_url("/api/embed"),
                       data=json.dumps({"model": MODEL, "input": texts, "truncate": False}).encode(),
                       headers={"Content-Type": "application/json"})
     with urlopen(request, timeout=30) as response:
