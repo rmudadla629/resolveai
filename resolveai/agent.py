@@ -38,7 +38,7 @@ def classify(question: str) -> dict:
     return json.loads(result["message"]["content"])
 
 
-def answer_question(question: str) -> tuple[int, dict]:
+def answer_question(question: str, allowed_order_ids=None) -> tuple[int, dict]:
     def reply(status, message, outcome):
         return status, {"mode": "local_ai", "message": message, "outcome": outcome}
 
@@ -61,5 +61,7 @@ def answer_question(question: str) -> tuple[int, dict]:
     order_id = decision["order_id"].strip().upper()
     if order_id not in ids:
         return reply(502, "I couldn't reliably identify the order ID. Please rephrase your question or use the order ID form below.", "invalid_decision")
+    if allowed_order_ids is not None and order_id not in allowed_order_ids:
+        return reply(404, "No accessible demo order was found.", "not_found")
     status, body = answer_order(order_id)
     return status, {**body, "mode": "local_ai", "model": "qwen3:4b", "tool": "lookup_order", "outcome": "found" if status == 200 else "not_found"}

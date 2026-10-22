@@ -21,6 +21,9 @@ def connect():
       id INTEGER PRIMARY KEY, request_id INTEGER NOT NULL, event TEXT NOT NULL,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP);
     ''')
+    if "actor" not in {r["name"] for r in db.execute("PRAGMA table_info(audit)")}:
+        db.execute("ALTER TABLE audit ADD COLUMN actor TEXT NOT NULL DEFAULT 'legacy'")
+        db.commit()
     return db
 
 
@@ -34,7 +37,7 @@ def effective_order(order_id, db):
     return order
 
 
-def submit(order_id):
+def submit(order_id, actor="reviewer"):
     order_id = order_id.strip().upper()
     db = connect()
     try:
@@ -49,7 +52,7 @@ def submit(order_id):
             if pending:
                 return f'Request #{pending["id"]} is already pending review.'
             request_id = db.execute("INSERT INTO requests(order_id,state) VALUES (?, 'pending')", (order_id,)).lastrowid
-            db.execute("INSERT INTO audit(request_id,event) VALUES (?, 'submitted')", (request_id,))
+            db.execute("INSERT INTO audit(request_id,event,actor) VALUES (?, 'submitted', ?)", (request_id, actor))
             return f"Request #{request_id} submitted for review. The order has not been cancelled."
     finally:
         db.close()
@@ -74,7 +77,7 @@ def decide(request_id, action):
                     state = "approved"
                     db.execute("INSERT OR REPLACE INTO overrides VALUES (?, 'cancelled')", (request["order_id"],))
             db.execute("UPDATE requests SET state=?, decided_at=CURRENT_TIMESTAMP WHERE id=?", (state, request_id))
-            db.execute("INSERT INTO audit(request_id,event) VALUES (?, ?)", (request_id, state))
+            db.execute("INSERT INTO audit(request_id,event,actor) VALUES (?, ?, 'reviewer')", (request_id, state))
             return f"Request #{request_id}: {state}."
     finally:
         db.close()

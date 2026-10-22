@@ -2,6 +2,7 @@
 
 import json
 import secrets
+import re
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlsplit
 
@@ -11,7 +12,7 @@ from .agent import answer_question
 from .review_interface import render_reviews
 from .reviews import submit, decide
 from .tracing import traced_answer, render_traces
-from . import auth
+from . import auth, customers
 
 REVIEW_TOKEN = secrets.token_urlsafe(32)
 
@@ -21,7 +22,7 @@ class Handler(BaseHTTPRequestHandler):
         if self.path.startswith("/reviews/") and not auth.authorized(self.headers.get("Cookie")):
             self.respond(401, auth.render_login(REVIEW_TOKEN, "Sign in to access review controls."), "text/html; charset=utf-8")
             return
-        if self.path not in ("/ask", "/reviews/submit", "/reviews/decide", "/login", "/logout"):
+        if self.path not in ("/ask", "/reviews/submit", "/reviews/decide", "/login", "/logout", "/customer/login", "/customer/logout", "/customer/submit"):
             self.respond(404, b'Endpoint not found.', "text/plain; charset=utf-8")
             return
         try:
@@ -33,6 +34,29 @@ class Handler(BaseHTTPRequestHandler):
             form = parse_qs(self.rfile.read(size).decode("utf-8"))
         except (ValueError, UnicodeError):
             self.respond(400, b'Invalid form submission.', "text/plain; charset=utf-8")
+            return
+        if self.path.startswith("/customer/"):
+            if not secrets.compare_digest(form.get("token", [""])[0], REVIEW_TOKEN):
+                self.respond(403, b'Invalid form token.', "text/plain")
+                return
+            username = customers.identity(self.headers.get("Cookie"))
+            if self.path == "/customer/logout":
+                customers.logout(self.headers.get("Cookie"))
+                self.redirect("/account", "resolveai_customer=; Max-Age=0; Path=/; HttpOnly; SameSite=Strict")
+                return
+            if self.path == "/customer/login":
+                session = customers.login(form.get("username", [""])[0], form.get("password", [""])[0])
+                if session is None:
+                    self.respond(401, customers.render_account(REVIEW_TOKEN, message="Sign-in failed."), "text/html; charset=utf-8")
+                    return
+                self.redirect("/account", f"resolveai_customer={session}; Max-Age=3600; Path=/; HttpOnly; SameSite=Strict")
+                return
+            if not username:
+                self.respond(401, customers.render_account(REVIEW_TOKEN, message="Sign in first."), "text/html; charset=utf-8")
+                return
+            order_id = form.get("order_id", [""])[0]
+            message = submit(order_id, actor=username) if customers.owns(username, order_id) else "No accessible demo order was found."
+            self.respond(200, customers.render_account(REVIEW_TOKEN, username, message), "text/html; charset=utf-8")
             return
         if self.path in ("/login", "/logout"):
             if not secrets.compare_digest(form.get("token", [""])[0], REVIEW_TOKEN):
@@ -64,11 +88,22 @@ class Handler(BaseHTTPRequestHandler):
             self.respond(200, render_reviews(REVIEW_TOKEN, message), "text/html; charset=utf-8")
             return
         question = form.get("question", [""])[0]
-        status, body = traced_answer(question, answer_question)
+        username = customers.identity(self.headers.get("Cookie"))
+        def scoped_answer(text):
+            ids = re.findall(r"\bDEMO-\d+\b", text.upper())
+            if ids and not username:
+                return 401, {"mode": "local_ai", "outcome": "sign_in_required", "message": "Sign in through Customer account before checking an order."}
+            if any(not customers.owns(username, order_id) for order_id in ids):
+                return 404, {"mode": "local_ai", "outcome": "not_found", "message": "No accessible demo order was found."}
+            return answer_question(text, allowed_order_ids=customers.OWNERSHIP.get(username, ()))
+        status, body = traced_answer(question, scoped_answer)
         self.respond(status, render_page(question=question, ai_body=body), "text/html; charset=utf-8")
 
     def do_GET(self):
         url = urlsplit(self.path)
+        if url.path == "/account":
+            self.respond(200, customers.render_account(REVIEW_TOKEN, customers.identity(self.headers.get("Cookie"))), "text/html; charset=utf-8")
+            return
         if url.path == "/traces":
             self.respond(200, render_traces(), "text/html; charset=utf-8")
             return
@@ -84,17 +119,33 @@ class Handler(BaseHTTPRequestHandler):
         if url.path == "/":
             params = parse_qs(url.query, keep_blank_values=True)
             order_id = params.get("order_id", [None])[0]
+            if order_id is not None and not self.order_access(order_id):
+                return
             self.respond(200, render_page(order_id), "text/html; charset=utf-8")
             return
         if url.path == "/health":
             status, body = 200, {"status": "ok", "mode": "deterministic_demo"}
         elif url.path == "/api/order-status":
             order_id = parse_qs(url.query).get("order_id", [""])[0]
+            if not self.order_access(order_id):
+                return
             status, body = answer_order(order_id)
         else:
             status, body = 404, {"message": "Endpoint not found."}
         payload = json.dumps(body).encode("utf-8")
         self.respond(status, payload, "application/json; charset=utf-8")
+
+    def order_access(self, order_id):
+        username = customers.identity(self.headers.get("Cookie"))
+        status = 401 if not username else 404
+        if username and customers.owns(username, order_id):
+            return True
+        body = {"message": "Sign in through Customer account to check orders." if not username else "No accessible demo order was found."}
+        if self.path.startswith("/api/"):
+            self.respond(status, json.dumps(body).encode(), "application/json")
+        else:
+            self.respond(status, customers.render_account(REVIEW_TOKEN, username, body["message"]), "text/html; charset=utf-8")
+        return False
 
     def respond(self, status, payload, content_type):
         self.send_response(status)

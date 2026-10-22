@@ -41,6 +41,9 @@ class OrderTests(IsolatedOrderTestCase):
         self.assertEqual(answer_order(" ")[0], 400)
 
     def test_http_contract(self):
+        customer = patch("resolveai.__main__.customers.identity", return_value="alex")
+        customer.start()
+        self.addCleanup(customer.stop)
         with ThreadingHTTPServer(("127.0.0.1", 0), Handler) as server:
             worker = threading.Thread(target=server.serve_forever, daemon=True)
             worker.start()
@@ -50,14 +53,14 @@ class OrderTests(IsolatedOrderTestCase):
                     request = Request(base + "/ask", data=b"question=Track+DEMO-1001", headers={"Content-Type": "application/x-www-form-urlencoded"})
                     with urlopen(request, timeout=2) as response:
                         self.assertIn("Your order is shipped.", response.read().decode())
-                    agent.assert_called_once_with("Track DEMO-1001")
+                    agent.assert_called_once_with("Track DEMO-1001", allowed_order_ids=("DEMO-1001", "DEMO-1002"))
                 with urlopen(base + "/?order_id=DEMO-1002", timeout=2) as response:
                     self.assertIn("text/html", response.headers["Content-Type"])
                     self.assertIn("is processing", response.read().decode())
                 with urlopen(base + "/api/order-status?order_id=DEMO-1001", timeout=2) as response:
                     self.assertEqual(response.status, 200)
                     self.assertEqual(json.load(response)["order"]["status"], "shipped")
-                for path, code in [("/api/order-status", 400), ("/api/order-status?order_id=UNKNOWN", 404), ("/missing", 404)]:
+                for path, code in [("/api/order-status", 404), ("/api/order-status?order_id=UNKNOWN", 404), ("/missing", 404)]:
                     with self.assertRaises(HTTPError) as error:
                         urlopen(base + path, timeout=2)
                     self.assertEqual(error.exception.code, code)

@@ -50,7 +50,7 @@ input:focus-visible,button:focus-visible,a:focus-visible {{outline:3px solid #71
 .help,.source,footer {{font-size:14px;color:#536278}} a {{color:#214faf}} .result {{border-top:1px solid #dce3ee;margin-top:24px;padding-top:18px;overflow-wrap:anywhere}}
 h2 {{font-size:21px;margin:0 0 10px}} footer {{margin-top:24px}} @media(max-width:480px) {{main {{margin-top:36px}} .card {{padding:20px}} button {{width:100%}}}}
 </style></head><body>
-<header><strong>ResolveAI<span style="color:#2255c9">.</span></strong></header>
+<header><strong>ResolveAI<span style="color:#2255c9">.</span></strong> · <a href="/account">Customer account</a></header>
 <main><div class="tag">Order support · Demo</div><h1>Where is my order?</h1>
 <p class="intro">Check a sample order or explore store policies with cited source passages. <a href="/policies">Read demo policies</a>.</p>
 <div class="card"><form action="/ask" method="post"><label for="question">Ask about an order or policy</label>
