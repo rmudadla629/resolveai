@@ -2,6 +2,8 @@
 
 An order support application with a Python API and browser interface. Responses are grounded in fictional store records, with a source reference for successful lookups.
 
+**[View the screenshot demo](WALKTHROUGH.md)** — order lookup, cited policies, customer access protection, cancellation review, and automated checks. No audio or video required.
+
 ## Current capabilities
 
 - Look up shipped, processing, and delivered sample orders.
