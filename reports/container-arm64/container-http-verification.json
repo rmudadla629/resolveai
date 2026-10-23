@@ -1,0 +1,28 @@
+{
+  "created_at": "2026-10-23T04:04:55.100595+00:00",
+  "platform": "Linux-7.0.14-linuxkit-aarch64-with-glibc2.36",
+  "architecture": "aarch64",
+  "model_endpoint": "http://ollama:11434",
+  "models": [
+    {
+      "name": "qwen3:4b",
+      "digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7"
+    },
+    {
+      "name": "all-minilm:22m",
+      "digest": "1b226e2802dbb772b5fc32a58f103ca1804ef7501331012de126ab22f67475ef"
+    }
+  ],
+  "checks": [
+    {
+      "check": "HTTP policy question using real Qwen3 and embeddings",
+      "passed": true,
+      "seconds": 2.612
+    },
+    {
+      "check": "Unauthenticated order API blocked",
+      "passed": true
+    }
+  ],
+  "limitations": "Local ARM64 Docker Compose verification. Credentials were not created; authenticated flows were exercised by isolated container regression tests. No public deployment, load testing, or challenge-set run in this check."
+}

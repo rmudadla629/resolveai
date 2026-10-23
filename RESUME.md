@@ -22,6 +22,6 @@ The final routing score is 44 successful attempts over two repetitions of the sa
 
 The final retrieval-only development comparison scored keyword search 6/10 and semantic fallback 10/10. It used a small tuned corpus of three fictional policy sections. Do not describe that as general search accuracy or compare it with an earlier baseline whose vocabulary changed without explaining the change.
 
-The repository currently contains 58 automated test methods; counts will change. AI calls are mocked in CI. Container CI verifies the app image, regression tests, and HTTP startup; it does not prove full Compose inference works. The presentation includes a [screenshot walkthrough](WALKTHROUGH.md); no public app deployment or recorded video has been verified.
+The repository currently contains 58 automated test methods; counts will change. AI calls are mocked in CI. Container CI verifies the app image, regression tests, and HTTP startup; full local ARM64 Compose inference was separately verified with 18 live scenarios and an HTTP policy request (see CONTAINERS.md). The presentation includes a [screenshot walkthrough](WALKTHROUGH.md); no public app deployment or recorded video has been verified.
 
 Avoid claims of production scale, real customers, business cost savings, cloud deployment, custom model training/fine-tuning, autonomous multi-agent resolution, or complete security. They are not established by this project. Describe your contribution truthfully and be candid about development assistance if asked.

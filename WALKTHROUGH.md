@@ -44,4 +44,4 @@ GitHub Actions shows successful `tests` and `container` jobs. They verify regres
 
 The authored challenge set improved from 15/22 to 22/22 in two repeated runs after routing changes. This is a tuned development benchmark, not held-out accuracy. See [challenge evidence](CHALLENGE_RESULTS.md), [architecture](ARCHITECTURE.md), and [container verification limits](CONTAINERS.md).
 
-The prototype includes fictional customer accounts, ownership enforcement, manual cancellation review, request tracing, login attempt limits, and a repeatable local demo. Public hosting and full AI inference inside Docker remain separately unverified. No real orders, refunds, or production customer outcomes are represented here.
+The prototype includes fictional customer accounts, ownership enforcement, manual cancellation review, request tracing, login attempt limits, and a repeatable local demo. Local ARM64 Docker inference has since been verified; see CONTAINERS.md for evidence and scope. Public hosting remains unverified. No real orders, refunds, or production customer outcomes are represented here.

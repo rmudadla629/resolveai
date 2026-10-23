@@ -29,7 +29,7 @@ Earlier iterations missed a faulty-product policy question, declined general can
 | --- | --- | --- |
 | Public access | Local HTTP cookies and in-memory sessions/limits | HTTPS/Secure cookies, shared storage, trusted proxy policy |
 | Trace access | Metadata page has no sign-in | Reviewer-only access before public exposure |
-| Container inference | CI builds/tests the app and checks HTTP startup without models | Verify full Compose inference and intended deployment architecture |
+| Container inference | ARM64 local run passed 58 tests, 18 live cases, and an HTTP semantic-policy request; CI remains model-free | Broader challenge/capacity testing and intended hosting validation |
 | Operational readiness | No demonstrated load capacity or model/database readiness probe | Capacity, dependency health, recovery, and deployment validation |
 | Account lifecycle | Fictional fixed mappings, no password recovery or multiple reviewers | Decide and implement requirements for any real use |
 | Evaluation | Small tuned datasets; model tags not immutable provenance | Independent questions, model digests, completeness/quality evaluation |
@@ -39,3 +39,7 @@ Earlier iterations missed a faulty-product policy question, declined general can
 The main README now includes complete account setup, current public API response codes, a concise evidence table, and an explicit local-prototype status. The detailed reference is in OPERATIONS.md. Completed work was removed from remaining-work lists. Screenshots are captioned according to visible evidence; the cancellation image shows approval, not the audit trail. Older UI/sample labels are identified as historical. Resume claims match the implemented scope.
 
 No real store integration, actual refunds, production users, autonomous multi-agent system, generated policy synthesis, custom model training, or public hosted application is claimed.
+
+## Local container verification follow-up
+
+See [CONTAINERS.md](CONTAINERS.md) and `reports/container-arm64/`. Local ARM64 Compose inference is verified within the stated scenarios. No native credentials were copied or persistent container accounts created. Models and state use separate Docker volumes. The app binds only localhost port 8001 and Ollama has no published host port. Public hosting remains unfinished.

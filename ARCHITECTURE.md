@@ -55,7 +55,7 @@ Before public deployment:
 
 1. HTTPS/Secure cookies, shared session/rate-limit storage, trusted proxy configuration, and authenticated trace access.
 2. Operational/load validation, model/database readiness checks, and a deployment/recovery plan.
-3. Full Compose model inference verification; current native Mac inference is separately tested.
+3. Broader Compose inference evaluation and deployment capacity checks; the original 18 scenarios and a real HTTP semantic-policy request now pass locally on ARM64.
 4. Independent evaluation questions, immutable model provenance, and quality checks beyond tuned examples.
 
 ## Sign-in attempt protection

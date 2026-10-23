@@ -2,7 +2,17 @@
 
 ## Verification status
 
-The GitHub Actions container job has passed image build, in-image regression tests, Compose syntax validation, and HTTP startup checks. Docker was unavailable locally when packaging was prepared; these CI results do not establish a local Mac container run. Full Compose model inference and Apple Silicon execution still require a local run; CI does not download Ollama or models.
+Local Docker Compose inference was verified on the M3 Mac (Linux aarch64 containers) on October 22, 2026, America/Chicago. The report filenames use UTC and therefore begin with October 23.
+
+- 58 automated tests passed inside the ARM64 app container.
+- The original 18 live AI scenarios passed through the container Ollama service.
+- Retrieval comparison scored keyword 6/10 and semantic fallback 10/10.
+- An actual HTTP policy question returned the shipping passage, citation, and semantic-search indicator; a signed-out order API call returned 401.
+- Ollama reported CPU inference; model digests and platform details are preserved in the HTTP verification report.
+
+Evidence: [live evaluation](reports/container-arm64/evaluation-20261023T040430718044Z.json), [retrieval comparison](reports/container-arm64/retrieval-20261023T040327052308Z.json), and [HTTP/model provenance](reports/container-arm64/container-http-verification.json).
+
+Container credentials were not provisioned during this check. Authenticated flows were exercised by isolated regression tests, not manually against new persistent container accounts. The 22-case challenge was not rerun in this verification. CI continues to build/test/start the app without downloading models. These results do not establish public deployment or production readiness.
 
 ## Prerequisites
 

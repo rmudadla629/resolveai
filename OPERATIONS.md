@@ -95,7 +95,7 @@ This is a small development benchmark with one run per case. It is not a held-ou
 
 ## Remaining work
 
-Public deployment requires HTTPS/Secure cookies, shared sessions and limits, operational validation, and a private reviewer-only trace view. Full Compose inference remains unverified. Further model evaluation needs independent cases and model artifact provenance. Customer authentication, reviewer review, tracing, container build/start CI, and the screenshot walkthrough are implemented.
+Public deployment requires HTTPS/Secure cookies, shared sessions and limits, operational validation, and a private reviewer-only trace view. Local ARM64 Compose inference has been verified for the original 18 live scenarios and a real HTTP semantic policy request; see CONTAINERS.md. Further model evaluation needs independent cases and model artifact provenance. Customer authentication, reviewer review, tracing, container build/start CI, and the screenshot walkthrough are implemented.
 
 Keep passwords, tokens, and API keys outside version control.
 
@@ -193,7 +193,7 @@ Counters are in memory, clear on server restart, and apply only to one process. 
 
 `Dockerfile` packages Flask/Waitress as a non-root application. `compose.yaml` publishes the app on localhost port 8001, uses private service networking for Ollama, and persists runtime state, reports, and model files in named volumes. The build context excludes local credentials and databases. `RESOLVEAI_OLLAMA_URL` supports the internal model service without changing the native localhost default.
 
-The CI container job validates Compose, builds the image, runs regression tests inside it, and checks server health without downloading models. Full Compose inference and native ARM container execution require separate verification. Docker was not installed locally when this packaging was prepared. See [Container guide](CONTAINERS.md) for setup and verification limits.
+The CI container job validates Compose, builds the image, runs regression tests inside it, and checks server health without downloading models. Local ARM64 execution and actual inference were subsequently verified; 58 container regression tests and 18 live scenarios passed. The reports distinguish this local run from model-free CI. See [Container guide](CONTAINERS.md) for setup and verification limits.
 
 ## Challenge evaluation and failure analysis
 

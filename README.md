@@ -79,7 +79,7 @@ The order API returns 401 when signed out, 404 for an inaccessible/missing ID, a
 
 ## Current delivery status
 
-**Working local portfolio prototype with a screenshot demo.** No public application URL or production usage is claimed. Full AI inference inside Docker and native ARM container execution remain unverified; container CI covers the application image on its runner.
+**Working local portfolio prototype with a screenshot demo.** No public application URL or production usage is claimed. Local ARM64 Compose inference is verified: 18/18 live scenarios, real HTTP semantic policy retrieval, and 58 container regression tests. See [container verification evidence](CONTAINERS.md). CI separately covers the application image without model downloads.
 
 Before public deployment: add HTTPS/Secure cookies, shared sessions and limits, authenticated trace access, and operational/load validation. The current single-process app uses in-memory sessions and fixed fictional customer mappings. Models and policies can still be misclassified outside tested examples. No real orders, refunds, customer outcomes, cost savings, or production scale are represented.
 
