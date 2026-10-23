@@ -2,7 +2,7 @@
 
 ## Verification status
 
-Docker was unavailable on the author's Mac when these files were prepared. Python regression tests can be run natively. The GitHub Actions container job builds the image, runs the regression suite inside it, validates Compose syntax, starts Waitress, and checks HTTP health. Check that job's result before claiming container validation. Full Compose model inference and Apple Silicon execution still require a local run; CI does not download Ollama or models.
+The GitHub Actions container job has passed image build, in-image regression tests, Compose syntax validation, and HTTP startup checks. Docker was unavailable locally when packaging was prepared; these CI results do not establish a local Mac container run. Full Compose model inference and Apple Silicon execution still require a local run; CI does not download Ollama or models.
 
 ## Prerequisites
 

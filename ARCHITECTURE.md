@@ -22,7 +22,7 @@ flowchart TD
 
 ## Request flow
 
-The HTTP form handler validates request size. The model returns schema-constrained intent and order ID. Python validates the decision; lookup IDs must occur in the original question. Order responses use record-based templates. Policy retrieval uses keyword overlap first, then cosine ranking when no keyword matches. Score and margin thresholds control semantic abstention. Policy excerpts are copied verbatim, not synthesized.
+The HTTP form handler validates request size and checks explicit order IDs against the signed-in customer before calling the model. The model returns schema-constrained intent and order ID. Python validates the decision; lookup IDs must occur in the original question. Order responses use record-based templates. Policy retrieval uses keyword overlap first, then cosine ranking when no keyword matches. Score and margin thresholds control semantic abstention. Policy excerpts are copied verbatim, not synthesized.
 
 Question requests receive trace IDs and record status, outcome, tool, retrieval method, and duration. Prompts and answers are excluded from the trace database. HTML output is escaped. Unexpected question-processing exceptions produce a generic response; unexpected route exceptions return generic HTTP 500 responses.
 
@@ -44,15 +44,19 @@ CI uses temporary databases and mocked model calls. Separate live evaluations us
 - Exact excerpts provide citations but not personalized eligibility decisions.
 - Keyword-first search is not weighted hybrid ranking; keyword collisions and semantic false negatives remain possible.
 - Three policy sections do not require a vector database. Larger corpora need ingestion, chunking, indexing, and access-aware retrieval.
-- Waitress-served Flask application with local reviewer sign-in, but with per-process login limits, but without shared deployment rate limiting or load validation.
+- Waitress-served Flask application with customer/reviewer sign-in and per-process login limits; shared deployment controls and load validation are unfinished.
 - Request-level metrics, without model spans, token counts, or accuracy measurement.
 
-## Delivery gates
+## Delivery status and remaining gates
 
-1. Authenticated customer/reviewer roles, order ownership checks, and reviewer audit identity.
-2. Deployment-ready application server, configuration, consistent error handling, request limits, and operational checks.
-3. Independent evaluations with paraphrases, negative examples, mixed intents, repeated runs, and category metrics.
-4. Reproducible deployment and a walkthrough documenting measured capabilities and limitations.
+Implemented locally: customer/reviewer sign-in, fixed order ownership, actor-bearing audit events, Waitress startup, body limits, generic error handling, request tracing, container build/start CI, and a screenshot walkthrough. GitHub CI verifies the application image, not full model inference in Compose.
+
+Before public deployment:
+
+1. HTTPS/Secure cookies, shared session/rate-limit storage, trusted proxy configuration, and authenticated trace access.
+2. Operational/load validation, model/database readiness checks, and a deployment/recovery plan.
+3. Full Compose model inference verification; current native Mac inference is separately tested.
+4. Independent evaluation questions, immutable model provenance, and quality checks beyond tuned examples.
 
 ## Sign-in attempt protection
 

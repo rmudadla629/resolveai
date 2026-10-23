@@ -1,40 +1,41 @@
-# Project review — October 22, 2026
+# ResolveAI repository review — October 22, 2026
 
-Working local prototype; ready for continued development and local demonstrations. Public deployment and production readiness are not established.
+## Current assessment
 
-## Measured results
+Working local portfolio prototype with a screenshot walkthrough, documented setup, evaluations, and CI. Public deployment and production readiness are not established. A video is optional and has been replaced by the screenshot demo for the current presentation.
+
+## Verified scope
+
+Customer/reviewer sign-in, fixed fictional ownership checks, record-grounded order answers, cited policy retrieval with semantic fallback, manual transactional cancellation review, audit actors, request metadata, login limits, demo backup/reset, and Flask/Waitress serving are implemented. There are 58 automated test methods. The repository's regression and container jobs have passed; see the [captured CI checks](docs/screenshots/06-ci-checks.png) and current runs in GitHub Actions.
+
+## Measured development results
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| Live AI development scenarios | 18/18 passed | [Report](reports/evaluation-20261022T082308803185Z.json) |
-| Keyword retrieval | 5/10 correct | [Comparison](reports/retrieval-20261022T082308910186Z.json) |
-| Keyword-first semantic fallback | 9/10 correct | Same comparison |
+| Original live workflow set | 18/18 | [Report](reports/evaluation-20261022T165323295585Z.json) |
+| Challenge before routing fixes | 15/22 | [Baseline](reports/evaluation-20261022T164613089057Z.json) |
+| Final challenge, two repetitions | 22/22 each; 44/44 attempts | [Report](reports/evaluation-20261022T165327234840Z.json) |
+| Retrieval comparison after vocabulary changes | Keyword 6/10; semantic fallback 10/10 | [Report](reports/retrieval-20261022T164730327199Z.json) |
 
-These small development datasets informed implementation and are not held out. Retrieval comparison bypasses chat routing. Neither benchmark measures production accuracy, load capacity, real customer outcomes, or cost savings. Report timestamps are UTC.
+The sets are authored development data, some of which informed fixes. Repeated attempts are not distinct cases. Retrieval-only measurement bypasses intent routing; the workflow evaluations bypass HTTP customer sign-in and use fixture-level access. Automated HTTP tests cover permissions separately. These results do not establish production accuracy, general safety, load capacity, business impact, or cost savings. The final challenge and original runs overlapped, so their timings cannot support a controlled speed comparison.
 
-## Known failure
+## Failure history
 
-“The product is faulty. What should I do?” should retrieve returns/damaged-item information, but retrieval abstains because similarity falls below the configured threshold. Lowering thresholds solely for this example could introduce false matches. Compare changes against independent negative examples before adopting them.
+Earlier iterations missed a faulty-product policy question, declined general cancellation eligibility, and partially answered mixed tracking/policy requests. Vocabulary and prompt changes corrected those examples on the development sets. Preserved baseline reports remain linked in [CHALLENGE_RESULTS.md](CHALLENGE_RESULTS.md). New phrasings may still fail; these fixes do not eliminate the need for independent evaluation.
 
-## Gaps found by code inspection
+## Remaining work
 
-| Priority | Gap | Next work |
+| Area | Current limitation | Required verification/change |
 | --- | --- | --- |
-| Before public deployment | No authentication, order ownership, or reviewer identity | Add roles and enforce permissions |
-| Before public deployment | Development server and limited operational controls | Add deployment-ready serving, configuration, limits, and validation |
-| Before broad accuracy claims | Small development-only evaluations | Add independent cases and repeated runs with per-category metrics |
-| Retrieval improvement | Keyword precedence and missed paraphrases | Compare ranking changes and measure false matches and abstentions |
-| Operational improvement | Review database errors may escape routes; model timeout can reach 90 seconds | Add consistent error handling and request progress feedback |
-| Observability improvement | No model spans or token counts | Keep latency and cost claims within measured scope |
+| Public access | Local HTTP cookies and in-memory sessions/limits | HTTPS/Secure cookies, shared storage, trusted proxy policy |
+| Trace access | Metadata page has no sign-in | Reviewer-only access before public exposure |
+| Container inference | CI builds/tests the app and checks HTTP startup without models | Verify full Compose inference and intended deployment architecture |
+| Operational readiness | No demonstrated load capacity or model/database readiness probe | Capacity, dependency health, recovery, and deployment validation |
+| Account lifecycle | Fictional fixed mappings, no password recovery or multiple reviewers | Decide and implement requirements for any real use |
+| Evaluation | Small tuned datasets; model tags not immutable provenance | Independent questions, model digests, completeness/quality evaluation |
 
-## Scope
+## Documentation review changes
 
-No real store integration, actual refunds, production users, multi-agent coordination, generated policy synthesis, or custom model training is implemented. Cancellation changes affect fictional local state only.
+The main README now includes complete account setup, current public API response codes, a concise evidence table, and an explicit local-prototype status. The detailed reference is in OPERATIONS.md. Completed work was removed from remaining-work lists. Screenshots are captioned according to visible evidence; the cancellation image shows approval, not the audit trail. Older UI/sample labels are identified as historical. Resume claims match the implemented scope.
 
-## Later challenge reassessment
-
-See [Challenge results](CHALLENGE_RESULTS.md). The previously missed faulty-product retrieval is corrected on the development example. Broader routing still has two documented failures. Customer/reviewer access checks, login limits, and Flask/Waitress serving have since been added; the gaps above describe the earlier review snapshot. Public readiness remains unverified.
-
-## Routing fix follow-up
-
-The two challenge routing failures were corrected on the authored development set: 22/22 in each of two runs, original scenarios 18/18, and 57 automated regressions passed. See CHALLENGE_RESULTS.md for the reports and the distinction between tuned examples and independent evaluation.
+No real store integration, actual refunds, production users, autonomous multi-agent system, generated policy synthesis, custom model training, or public hosted application is claimed.
