@@ -14,6 +14,10 @@ A local AI support application for a fictional store: check orders, retrieve cit
 
 Python controls access, validates model output, and retrieves saved facts. Chat cannot approve cancellations. General policy questions work without customer sign-in; order records require it. This is a constrained workflow with extractive policy answers, not autonomous multi-agent resolution or model fine-tuning.
 
+## Public-hosting preparation
+
+A separate [Streamlit demo](STREAMLIT.md) is prepared with Groq routing, CPU policy embeddings, and visitor-isolated fictional review state. It is not publicly deployed or live-Groq verified yet. Its selectable roles simulate customer/reviewer behavior and do not implement public authentication. Original local evaluation scores do not establish Groq performance.
+
 ## Run locally on macOS
 
 Requires Python 3.12, Git, and [Ollama](https://ollama.com/download/mac). Keep Ollama open. From Terminal:

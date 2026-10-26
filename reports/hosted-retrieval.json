@@ -1,0 +1,82 @@
+{
+  "method": "Keyword-first, FastEmbed all-MiniLM-L6-v2 CPU fallback; fixed .35 similarity/.06 margin",
+  "scope": "Same small authored development retrieval set; not independent validation or live Groq testing",
+  "passed": 10,
+  "total": 10,
+  "peak_rss_MiB": 341.328125,
+  "results": [
+    {
+      "question": "What is the return policy?",
+      "expected": "returns",
+      "actual": "returns",
+      "method": "keyword",
+      "passed": true
+    },
+    {
+      "question": "How long does shipping take?",
+      "expected": "shipping",
+      "actual": "shipping",
+      "method": "keyword",
+      "passed": true
+    },
+    {
+      "question": "What is the cancellation policy?",
+      "expected": "cancellations",
+      "actual": "cancellations",
+      "method": "keyword",
+      "passed": true
+    },
+    {
+      "question": "How soon will my parcel reach me?",
+      "expected": "shipping",
+      "actual": "shipping",
+      "method": "semantic_fastembed",
+      "passed": true
+    },
+    {
+      "question": "Can I stop a purchase before it leaves the warehouse?",
+      "expected": "cancellations",
+      "actual": "cancellations",
+      "method": "semantic_fastembed",
+      "passed": true
+    },
+    {
+      "question": "Can I send an unopened item back?",
+      "expected": "returns",
+      "actual": "returns",
+      "method": "semantic_fastembed",
+      "passed": true
+    },
+    {
+      "question": "When will the money go back to my card?",
+      "expected": "returns",
+      "actual": "returns",
+      "method": "semantic_fastembed",
+      "passed": true
+    },
+    {
+      "question": "The product is faulty. What should I do?",
+      "expected": "returns",
+      "actual": "returns",
+      "method": "keyword",
+      "passed": true
+    },
+    {
+      "question": "What is your warranty policy?",
+      "expected": null,
+      "actual": null,
+      "method": "semantic_fastembed",
+      "passed": true
+    },
+    {
+      "question": "Do you offer gift wrapping?",
+      "expected": null,
+      "actual": null,
+      "method": "semantic_fastembed",
+      "passed": true
+    }
+  ],
+  "model_repository": "Qdrant/all-MiniLM-L6-v2-onnx",
+  "model_revision": "d13954661f83248295ba75c1ed411eef3b7b936e",
+  "policy_sha256": "9bd584eae5bfd6cfdf4762ee5cd06414241ea6e63af2586557e633269bafba7e"
+}

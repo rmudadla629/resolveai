@@ -17,7 +17,7 @@ SCHEMA = {
 }
 
 
-def classify(question: str) -> dict:
+def routing_payload(question: str) -> dict:
     payload = {
         "model": "qwen3:4b", "stream": False, "think": False,
         "format": SCHEMA, "options": {"temperature": 0, "num_ctx": 4096, "num_predict": 128},
@@ -49,6 +49,11 @@ def classify(question: str) -> dict:
             {"role": "user", "content": question},
         ],
     }
+    return payload
+
+
+def classify(question: str) -> dict:
+    payload = routing_payload(question)
     request = Request(ollama_url("/api/chat"), data=json.dumps(payload).encode(),
                       headers={"Content-Type": "application/json"}, method="POST")
     with urlopen(request, timeout=90) as response:
