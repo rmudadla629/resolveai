@@ -1,5 +1,7 @@
 # ResolveAI
 
+**[Try the live support demo](https://resolveai-rmudadla629.streamlit.app/)** — fictional orders, Groq routing, and visitor-isolated review simulation.
+
 A local AI support application for a fictional store: check orders, retrieve cited policies, and send cancellation requests through reviewer approval.
 
 **[View the screenshot demo](WALKTHROUGH.md)** · [Architecture](ARCHITECTURE.md) · [Evaluation evidence](CHALLENGE_RESULTS.md)
@@ -16,7 +18,7 @@ Python controls access, validates model output, and retrieves saved facts. Chat 
 
 ## Public-hosting preparation
 
-A separate [Streamlit demo](STREAMLIT.md) is prepared with Groq routing, CPU policy embeddings, and visitor-isolated fictional review state. It is not publicly deployed or live-Groq verified yet. Its selectable roles simulate customer/reviewer behavior and do not implement public authentication. Original local evaluation scores do not establish Groq performance.
+A separate [Streamlit demo](STREAMLIT.md) is prepared with Groq routing, CPU policy embeddings, and visitor-isolated fictional review state. The [public demo](https://resolveai-rmudadla629.streamlit.app/) has been checked with live Groq routing for a known order and a paraphrased shipping-policy question. These functional smoke checks are not a full model-quality evaluation. Its selectable roles simulate customer/reviewer behavior and do not implement public authentication. Original local evaluation scores do not establish Groq performance.
 
 ## Run locally on macOS
 

@@ -1,6 +1,6 @@
 # ResolveAI: free hosted-demo preparation
 
-Status: prepared locally. No public URL or live Groq quality evaluation has been verified. The original password-protected Flask/Ollama app remains available unchanged in behavior; the Streamlit version is a deliberately labeled fictional simulation.
+Status: deployed at **[resolveai-rmudadla629.streamlit.app](https://resolveai-rmudadla629.streamlit.app/)**. Live browser smoke checks verified a record-grounded order response and a shipping paraphrase with semantic retrieval. No full Groq quality evaluation has been performed. The original password-protected Flask/Ollama app remains available unchanged in behavior; the Streamlit version is a deliberately labeled fictional simulation.
 
 ## What changes in this version
 
@@ -64,10 +64,14 @@ After private setup, test actual Groq routing rather than relying on the mocked 
 - Open a separate browser session → DEMO-1002 is still processing there. Role selection within a session is a simulation, not real access control.
 - Test quota/provider failure messaging and inspect secrets are absent from source/log output.
 
-The existing local Qwen3 evaluation results do not transfer to Groq. Re-run relevant development questions with the new model and document failures before claiming equivalent quality. A free API account is required for that final check; no live Groq test has been performed during this preparation.
+The existing local Qwen3 evaluation results do not transfer to Groq. Re-run relevant development questions with the new model and document failures before claiming equivalent quality. Live Groq order and semantic-policy smoke checks subsequently passed through the public browser interface; they do not establish equivalent quality across the full development datasets.
 
 ## Evidence so far
 
 [Hosted retrieval report](reports/hosted-retrieval.json): 10/10 on the same small authored development retrieval set. This is not independent validation, broad retrieval accuracy, or an end-to-end Groq score. Software tests verify payload structure, provider errors, ID validation, ownership checks, isolated state, explicit approval, and Streamlit interaction without external model calls. Models and the runtime cache stay excluded from Git.
 
 Official references: [Groq structured outputs](https://console.groq.com/docs/structured-outputs), [Groq free quotas](https://console.groq.com/docs/rate-limits), [FastEmbed](https://qdrant.tech/documentation/embeddings/fastembed/), [Streamlit Community Cloud](https://docs.streamlit.io/deploy/streamlit-community-cloud).
+
+## Additional public boundary checks
+
+In the deployed browser session, alex asking about DEMO-1003 returned “No accessible demo order was found.” A chat request to cancel DEMO-1002 was declined, and a subsequent direct lookup confirmed the order remained processing. Together with the known-order and semantic-policy checks, these are four functional smoke scenarios, not a comprehensive security audit or a rerun of the full Groq development benchmark.
